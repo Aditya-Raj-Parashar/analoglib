@@ -10,3 +10,14 @@ window.MathJax = {
     processHtmlClass: "arithmatex"
   }
 };
+
+if (typeof document !== "undefined" && document.subscribe) {
+  document.subscribe(function() {
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      MathJax.startup.output.clearCache();
+      MathJax.typesetClear();
+      MathJax.texReset();
+      MathJax.typesetPromise();
+    }
+  });
+}
