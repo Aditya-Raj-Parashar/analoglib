@@ -147,14 +147,14 @@ banner("5. Noise Sensitivity Study")
 W = rng.uniform(-1, 1, (32, 16))
 V = rng.uniform(0, 1, 32)
 
-# Reference output (ideal)
-xbar_ref = al.Crossbar(32, 16, device=al.IdealDevice(),
-                        mapping=al.DifferentialMapping(w_max=1.0))
-xbar_ref.load_weights(W, quantize=False)
-out_ref = xbar_ref.vmm(V)
+# Reference output (physical baseline in Amperes)
+dev_ref = al.ReRAM(g_min=1e-6, g_max=100e-6, num_states=256, read_noise_sigma=0.0)
+xbar_ref = al.Crossbar(32, 16, device=dev_ref, mapping=al.DifferentialMapping(w_max=1.0))
+xbar_ref.load_weights(W, quantize=True)
+out_ref = xbar_ref.vmm(V, mode=al.SimulationMode.DEVICE)
 
-print(f"{'Noise sig':>10}  {'Max Delta I':>12}  {'Mean Delta I':>12}  {'SNR (dB)':>10}")
-print("-" * 50)
+print(f"{'Noise sig':>10}  {'Max Err (A)':>12}  {'Mean Err (A)':>12}  {'Rel Err (%)':>12}  {'SNR (dB)':>10}")
+print("-" * 64)
 
 for sigma in [0.0, 0.01, 0.02, 0.05, 0.10, 0.20]:
     dev = al.ReRAM(g_min=1e-6, g_max=100e-6, num_states=256,
@@ -169,13 +169,17 @@ for sigma in [0.0, 0.01, 0.02, 0.05, 0.10, 0.20]:
         out = xbar.vmm(V, noise=True, mode=al.SimulationMode.DEVICE)
         errors.append(np.abs(out_ref - out))
 
-    max_err = np.max(errors)
-    mean_err = np.mean(errors)
+    abs_err_matrix = np.array(errors)
+    max_err = np.max(abs_err_matrix)
+    mean_err = np.mean(abs_err_matrix)
+    rel_err = (mean_err / (np.mean(np.abs(out_ref)) + 1e-30)) * 100
 
     signal_power = np.mean(out_ref ** 2)
-    noise_power = np.mean(np.array(errors) ** 2)
+    noise_power = np.mean(abs_err_matrix ** 2)
     snr = 10 * np.log10(signal_power / (noise_power + 1e-30))
-    print(f"{sigma:>10.3f}  {max_err:>12.6f}  {mean_err:>12.6f}  {snr:>10.1f}")
+    
+    print(f"{sigma:>10.3f}  {max_err:>12.2e}  {mean_err:>12.2e}  {rel_err:>12.2f}  {snr:>10.1f}")
+
 
 
 # =====================================================================
@@ -189,7 +193,9 @@ mapping = al.DifferentialMapping(w_max=1.0)
 xbar = al.Crossbar(8, 4, device=dev, mapping=mapping)
 xbar.load_weights(rng.uniform(-1, 1, (8, 4)))
 
-adc = al.ADC(bits=6, v_min=-5e-3, v_max=5e-3)
+# Physical current bounds: V_max (1.0) * nrows (8) * g_max (100uS) = 800uA
+# Let's set ADC to capture ± 500 µA expected output range
+adc = al.ADC(bits=6, v_min=-500e-6, v_max=500e-6)
 dac = al.DAC(bits=6, v_min=0.0, v_max=1.0)
 
 engine = al.SimulationEngine(crossbars=[xbar], adc=adc, dac=dac)
@@ -197,13 +203,33 @@ V = rng.uniform(0, 1, 8)
 
 results = engine.run_comparison(V, modes=["ideal", "device", "hardware"])
 
-print(f"Input V:        {V[:4]}...")
+# Diagnostic Trace for Hardware Pipeline
+print(f"--- Hardware Pipeline Trace ---")
+scale_factor = (dev.g_max - dev.g_min) / 1.0  # I_out = V @ W_norm * scale_factor
+
+print(f"1. Input Voltage V (DAC input):    {V[:4]}...")
+V_dac = dac.convert(V)
+print(f"2. DAC Output Voltages:            {V_dac[:4]}...")
+# We use device mode to see raw current before ADC
+I_raw = xbar.vmm(V_dac, noise=True, mode=al.SimulationMode.DEVICE)
+print(f"3. Raw Crossbar Current (A):       {I_raw}")
+I_quant = adc.convert(I_raw)
+print(f"4. Quantized ADC Current (A):      {I_quant}")
+W_recon_output = I_quant / scale_factor
+print(f"5. Reconstructed Math Output:      {W_recon_output}")
+
+print(f"\n--- Simulation Engine API Output ---")
 for mode_name, output in results.items():
     print(f"Output ({mode_name:>8}): {output}")
 
-# Cross-mode error
-print(f"\nDevice vs Ideal error:   {np.max(np.abs(results['ideal'] - results['device'])):.6f}")
-print(f"Hardware vs Ideal error: {np.max(np.abs(results['ideal'] - results['hardware'])):.6f}")
+# For mathematical error comparison, we reconstruct ALL outputs back to dimensionless math space
+# since results["ideal"] in this Engine is evaluated on a ReRAM crossbar (which outputs Amperes).
+math_expected = results["ideal"] / scale_factor
+device_reconstructed = results["device"] / scale_factor
+hardware_reconstructed = results["hardware"] / scale_factor
+
+print(f"\nDevice vs Ideal math absolute error:   {np.max(np.abs(math_expected - device_reconstructed)):.6f}")
+print(f"Hardware vs Ideal math absolute error: {np.max(np.abs(math_expected - hardware_reconstructed)):.6f}")
 
 
 # =====================================================================
