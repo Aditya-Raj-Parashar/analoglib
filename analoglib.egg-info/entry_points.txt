@@ -1,2 +1,2 @@
 [console_scripts]
-analog = analoglib.cli.main:cli
+analog = analoglib.cli.main:main

@@ -1,15 +1,15 @@
 numpy>=1.24
 pycryptodome>=3.19
+msgpack>=1.0.0
 
 [all]
-analoglib[cli,dev,tensorflow,torch,viz]
-
-[cli]
-click>=8.1
+analoglib[dev,tensorflow,torch,viz]
 
 [dev]
 pytest>=7.4
 pytest-cov>=4.1
+build>=1.0.0
+twine>=4.0.0
 
 [tensorflow]
 tensorflow>=2.13
