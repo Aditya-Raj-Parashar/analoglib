@@ -8,12 +8,15 @@ Quick start::
     import analoglib as al
 
     device = al.devices.ReRAM(g_min=1e-6, g_max=100e-6, num_states=256)
-    xbar = al.Crossbar(128, 64, device=device, differential=True)
+    xbar = al.Crossbar(128, 64, device=device)
     xbar.load_weights(W)
     out = xbar.vmm(V)
 
-    al.save("model.analog", [xbar])
-    loaded = al.load("model.analog")
+    # High-level workflow via AIR
+    model = al.AnalogModel.from_numpy([W1, W2])
+    model.compile(device=device, adc_bits=8, dac_bits=8)
+    result = model.simulate(x, mode="hardware")
+    result.report()
 """
 
 from __future__ import annotations
@@ -38,8 +41,9 @@ from .mapping.base import MappingStrategy
 from .mapping.differential import DifferentialMapping
 from .mapping.offset import OffsetMapping
 
-# Crossbar
+# Crossbar (single + tiled)
 from .crossbar.crossbar import Crossbar
+from .crossbar.tiled import TiledCrossbar
 
 # ADC / DAC
 from .adc_dac.adc import ADC
@@ -50,6 +54,33 @@ from .simulation.engine import SimulationEngine
 
 # Serialization
 from .serialization.analog_format import save, load
+from . import serialization
+
+# AIR — Analog Intermediate Representation
+from . import air
+from .air.schema import AIRGraph, AIRLayer, LayerType, PeripheralConfig, EffectConfig
+from .air.lower import lower
+from .air.model import AnalogModel, SimulationResult
+
+# Hardware Effects
+from . import effects
+from .effects.ir_drop import IRDrop
+from .effects.thermal import Thermal
+from .effects.drift import Drift
+
+# Analytics
+from . import analysis
+from .analysis.profiler import AnalogProfiler, AnalogReport
+
+# Exporters
+from . import exporters
+from .exporters.spice import SpiceExporter
+
+# Visualization
+from . import visualization
+
+# Neural converters
+from . import neural
 
 
 __all__ = [
@@ -63,11 +94,26 @@ __all__ = [
     # Mapping
     "mapping", "MappingStrategy", "DifferentialMapping", "OffsetMapping",
     # Crossbar
-    "Crossbar",
+    "Crossbar", "TiledCrossbar",
     # ADC / DAC
     "ADC", "DAC",
     # Simulation
     "SimulationEngine",
     # Serialization
-    "save", "load",
+    "save", "load", "serialization",
+    # AIR
+    "air",
+    "AIRGraph", "AIRLayer", "LayerType", "PeripheralConfig", "EffectConfig",
+    "lower",
+    "AnalogModel", "SimulationResult",
+    # Effects
+    "effects", "IRDrop", "Thermal", "Drift",
+    # Analytics
+    "analysis", "AnalogProfiler", "AnalogReport",
+    # Exporters
+    "exporters", "SpiceExporter",
+    # Visualization
+    "visualization",
+    # Neural
+    "neural",
 ]
