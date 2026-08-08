@@ -1,0 +1,126 @@
+# AnalogLib
+
+[![PyPI Version](https://img.shields.io/pypi/v/analoglib.svg)](https://pypi.org/project/analoglib/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+
+**AnalogLib** is an open-source Python library for simulating analog in-memory computing (IMC) and neural network inference on resistive crossbar architectures (ReRAM, Phase-Change Memory, Flash, and memristive arrays).
+
+---
+
+## Key Features
+
+- **Analog Intermediate Representation (AIR)**: Decoupled intermediate representation schema with lowering compiler passes.
+- **Neural Network Converters**: Convert PyTorch models (`nn.Module`) or NumPy weight lists straight to analog crossbar engines.
+- **Physical Device Models**: Quantized ReRAM device models with multi-state conductance, read noise, and spatial variation.
+- **Tiled Crossbar Subsystem**: Automatically partition large weight matrices across 2D grids of physical crossbar tiles.
+- **Physical Hardware Non-Idealities**: Parasitic wire IR drop, Arrhenius temperature dependence, and power-law retention drift.
+- **Analytics & Profiler**: Calculate array power, read energy, ADC/DAC energy overhead, cell area, latency, and TOPS/W.
+- **SPICE Netlist Exporter**: Export crossbar layers to standalone SPICE netlists for **ngspice** or **LTspice**.
+- **Encrypted Model Format**: Secure, encrypted `.analog` binary format (AES-256-GCM + MsgPack).
+
+---
+
+## Quick Start
+
+### Installation
+
+```bash
+pip install analoglib
+```
+
+To install optional PyTorch and visualization support:
+
+```bash
+pip install "analoglib[torch,viz]"
+```
+
+---
+
+## 5-Minute Usage Example
+
+### High-Level Model API
+
+```python
+import analoglib as al
+import numpy as np
+
+# 1. Load trained weight matrices (or convert PyTorch nn.Module)
+W1 = np.random.randn(784, 128)
+W2 = np.random.randn(128, 10)
+
+# 2. Build AnalogModel via AIR
+model = al.AnalogModel.from_numpy([W1, W2], activations=["relu", "softmax"])
+
+# 3. Target physical ReRAM crossbars + ADC/DAC + Hardware Effects
+model.compile(
+    device=al.ReRAM(g_min=1e-6, g_max=100e-6, num_states=256, read_noise_sigma=0.01),
+    adc_bits=8,
+    dac_bits=8,
+    r_wire=1.0,     # Parasitic IR drop
+    E_a=0.1,        # Thermal Arrhenius scaling
+    nu=0.05,        # Retention drift
+)
+
+# 4. Simulate inference
+x_input = np.random.uniform(0, 1, 784)
+result = model.simulate(x_input, mode="hardware")
+
+# 5. Print hardware profiling & energy report
+result.report()
+```
+
+---
+
+## PyTorch Model Conversion
+
+```python
+import torch.nn as nn
+import analoglib as al
+
+# PyTorch network
+torch_model = nn.Sequential(
+    nn.Linear(784, 128),
+    nn.ReLU(),
+    nn.Linear(128, 10)
+)
+
+# Convert & compile to analog crossbars
+model = al.AnalogModel.from_torch(torch_model)
+model.compile(device=al.ReRAM(num_states=256), adc_bits=8, dac_bits=8)
+result = model.simulate(x_input, mode="hardware")
+```
+
+---
+
+## Command Line Interface (CLI)
+
+```bash
+# Inspect a saved .analog file
+analog info model.analog
+
+# Run hardware inference
+analog simulate model.analog --mode hardware
+
+# Profile array power, TOPS/W, latency, and area
+analog profile model.analog
+
+# Export to SPICE netlist
+analog export-spice model.analog --out circuit.cir --dialect ngspice
+```
+
+---
+
+## Documentation
+
+For full guides and API references:
+- [Beginner Starter Guide](https://github.com/Aditya-Raj-Parashar/analoglib/blob/main/docs/getting_started.md)
+- [Core Concepts & Equations](https://github.com/Aditya-Raj-Parashar/analoglib/blob/main/docs/core_concepts.md)
+- [AIR Architecture Guide](https://github.com/Aditya-Raj-Parashar/analoglib/blob/main/docs/air_guide.md)
+- [API Reference](https://github.com/Aditya-Raj-Parashar/analoglib/blob/main/docs/api_reference.md)
+
+---
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.

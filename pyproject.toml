@@ -5,47 +5,59 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "analoglib"
 version = "0.1.0"
-description = "Open-source analog computing library for resistive crossbar neural network simulation"
+description = "Open-source analog in-memory computing library for resistive crossbar neural network simulation"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [
-    {name = "AnalogLib Contributors"}
+    {name = "Aditya Raj Parashar", email = "adityarajparashar@gmail.com"}
 ]
 keywords = [
     "analog-computing", "reram", "crossbar", "memristor",
     "neuromorphic", "in-memory-computing", "neural-network",
-    "hardware-simulation"
+    "hardware-simulation", "spice", "air"
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
     "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
     "numpy>=1.24",
     "pycryptodome>=3.19",
+    "msgpack>=1.0.0",
 ]
 
 [project.optional-dependencies]
 torch = ["torch>=2.0"]
 tensorflow = ["tensorflow>=2.13"]
 viz = ["matplotlib>=3.7"]
-cli = ["click>=8.1"]
 dev = [
     "pytest>=7.4",
     "pytest-cov>=4.1",
+    "build>=1.0.0",
+    "twine>=4.0.0",
 ]
 all = [
-    "analoglib[torch,tensorflow,viz,cli,dev]",
+    "analoglib[torch,tensorflow,viz,dev]",
 ]
 
+[project.urls]
+Homepage = "https://github.com/Aditya-Raj-Parashar/analoglib"
+Documentation = "https://github.com/Aditya-Raj-Parashar/analoglib/tree/main/docs"
+Repository = "https://github.com/Aditya-Raj-Parashar/analoglib"
+Issues = "https://github.com/Aditya-Raj-Parashar/analoglib/issues"
+
 [project.scripts]
-analog = "analoglib.cli.main:cli"
+analog = "analoglib.cli.main:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

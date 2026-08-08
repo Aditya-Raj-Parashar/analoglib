@@ -1,0 +1,60 @@
+# Byte-compiled / Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# C extensions & build artifacts
+build/
+bdist.*/
+dist/
+sdist/
+wheels/
+*.egg-info/
+.eggs/
+*.so
+*.dylib
+*.pyd
+*.dll
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.pyt
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# SPICE simulation outputs & transient files
+*.raw
+*.log
+*.op.raw
+*.cir.out
+
+# Temporary / Scratch artifacts
+/tmp/
+*.tmp
+*.bak
