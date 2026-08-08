@@ -143,8 +143,8 @@ class ReRAM(Device):
         return (
             f"ReRAM(g_min={self.g_min:.2e}, g_max={self.g_max:.2e}, "
             f"states={self.num_states}, "
-            f"noise_σ={self.read_noise_sigma}, "
-            f"prog_err_σ={self.programming_error_sigma}, "
-            f"d2d_σ={self.d2d_variation_sigma}, "
+            f"noise_sig={self.read_noise_sigma}, "
+            f"prog_err_sig={self.programming_error_sigma}, "
+            f"d2d_sig={self.d2d_variation_sigma}, "
             f"stuck_at={self.stuck_at_fault_rate})"
         )
