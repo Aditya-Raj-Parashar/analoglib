@@ -1,0 +1,2 @@
+[console_scripts]
+analog = analoglib.cli.main:cli
