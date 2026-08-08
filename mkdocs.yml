@@ -100,4 +100,6 @@ nav:
       - Core Concepts Specification: core_concepts.md
       - Architecture & Design Overview: getting_started.md
       - Post-MVP Architecture Plan: post_mvp_plan.md
+      - Documentation Coverage & Audit Report: DOCUMENTATION_COVERAGE.md
+
 
