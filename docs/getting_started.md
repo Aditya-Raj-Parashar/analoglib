@@ -27,35 +27,31 @@ pip install -e .
 
 ## 2. Starter Tutorial: 5-Minute Quick Start
 
-### Step 1: Create a ReRAM Crossbar
 ```python
 import analoglib as al
 import numpy as np
 
-# Define physical ReRAM device (1 µS to 100 µS, 256 discrete states)
+# 1. Define physical ReRAM device (1 µS to 100 µS, 256 discrete states)
 device = al.ReRAM(g_min=1e-6, g_max=100e-6, num_states=256, read_noise_sigma=0.01)
 
-# Initialize a 128x64 differential crossbar
+# 2. Initialize a 128x64 differential crossbar
 xbar = al.Crossbar(rows=128, cols=64, device=device, differential=True)
 
-# Load weight matrix (mapped automatically to G+ and G- conductances)
+# 3. Load weight matrix (mapped automatically to G+ and G- conductances)
 W = np.random.uniform(-1.0, 1.0, (128, 64))
 xbar.load_weights(W, quantize=True)
-```
 
-### Step 2: Perform Analog Matrix-Vector Multiplication (VMM)
-```python
-# Create input voltage vector
+# 4. Create input voltage vector
 V_in = np.random.uniform(0.0, 1.0, 128)
 
-# Execute VMM in three different simulation modes:
-# 1. IDEAL: Mathematical V @ W (unquantized, no noise)
+# 5. Execute VMM in three different simulation modes:
+# Mode 1: IDEAL (Mathematical V @ W, unquantized, no noise)
 y_ideal = xbar.vmm(V_in, mode=al.SimulationMode.IDEAL)
 
-# 2. DEVICE: Quantized conductances with read noise
+# Mode 2: DEVICE (Quantized conductances with read noise)
 y_device = xbar.vmm(V_in, mode=al.SimulationMode.DEVICE)
 
-# 3. HARDWARE: Complete peripheral circuit pipeline (DAC -> VMM -> ADC)
+# Mode 3: HARDWARE (Complete peripheral circuit pipeline: DAC -> VMM -> ADC)
 engine = al.SimulationEngine(
     crossbars=[xbar],
     adc=al.ADC(bits=8, v_min=-500e-6, v_max=500e-6),
@@ -71,36 +67,37 @@ y_hardware = engine.run(V_in, mode="hardware")
 Using **AIR (Analog Intermediate Representation)**, you can convert PyTorch models directly to analog simulation engines with zero manual mapping required:
 
 ```python
-import torch
-import torch.nn as nn
-import analoglib as al
+try:
+    import torch
+    import torch.nn as nn
+    import analoglib as al
+    import numpy as np
 
-# 1. Define and train your PyTorch model
-torch_model = nn.Sequential(
-    nn.Linear(784, 128),
-    nn.ReLU(),
-    nn.Linear(128, 10),
-)
+    # 1. Define your PyTorch model
+    torch_model = nn.Sequential(
+        nn.Linear(784, 128),
+        nn.ReLU(),
+        nn.Linear(128, 10),
+    )
 
-# 2. Convert PyTorch model to AnalogModel
-model = al.AnalogModel.from_torch(torch_model)
+    # 2. Convert PyTorch model to AnalogModel
+    model = al.AnalogModel.from_torch(torch_model)
 
-# 3. Compile targeting physical ReRAM crossbars + ADC/DAC + Hardware Effects
-model.compile(
-    device=al.ReRAM(g_min=1e-6, g_max=100e-6, num_states=256, read_noise_sigma=0.01),
-    adc_bits=8,
-    dac_bits=8,
-    r_wire=1.0,    # Parasitic IR drop (wire resistance per cell)
-    E_a=0.1,       # Thermal Arrhenius conductance scaling
-    nu=0.05,       # Temporal retention drift
-)
+    # 3. Compile targeting physical ReRAM crossbars + ADC/DAC
+    model.compile(
+        device=al.ReRAM(g_min=1e-6, g_max=100e-6, num_states=256, read_noise_sigma=0.01),
+        adc_bits=8,
+        dac_bits=8,
+    )
 
-# 4. Simulate inference
-x_input = np.random.uniform(0, 1, 784)
-result = model.simulate(x_input, mode="hardware")
+    # 4. Simulate inference
+    x_input = np.random.uniform(0, 1, 784)
+    result = model.simulate(x_input, mode="hardware")
 
-# 5. Generate Hardware Performance & Accuracy Report
-result.report()
+    # 5. Generate Hardware Performance & Accuracy Report
+    result.report()
+except ImportError:
+    print("PyTorch not installed. Install with: pip install \"analoglib[torch]\"")
 ```
 
 ---
@@ -110,13 +107,17 @@ result.report()
 When your weight matrix exceeds the physical dimensions of a single crossbar array (e.g., a 1024x512 matrix on 128x64 physical tiles), use `TiledCrossbar`:
 
 ```python
-from analoglib import TiledCrossbar, ReRAM
+import analoglib as al
+import numpy as np
+
+W_large = np.random.randn(1024, 512)
+V_in = np.random.uniform(0.0, 1.0, 1024)
 
 # Partition 1024x512 weight matrix into 128x64 physical crossbar tiles
-tiled_xbar = TiledCrossbar.from_matrix(
+tiled_xbar = al.TiledCrossbar.from_matrix(
     W_large,
     tile_shape=(128, 64),
-    device=ReRAM(g_min=1e-6, g_max=100e-6, num_states=256),
+    device=al.ReRAM(g_min=1e-6, g_max=100e-6, num_states=256),
 )
 
 # Performs VMM across all 64 tiles (8x8 grid) and accumulates output currents
@@ -130,11 +131,17 @@ y_out = tiled_xbar.vmm(V_in)
 Export your loaded crossbar arrays into a standalone SPICE netlist for circuit validation in **ngspice** or **LTspice**:
 
 ```python
+import analoglib as al
+import numpy as np
 from analoglib.exporters import SpiceExporter
+
+xbar = al.Crossbar(rows=128, cols=64, device=al.IdealDevice())
+xbar.load_weights(np.random.randn(128, 64))
 
 exporter = SpiceExporter(dialect="ngspice", R_load=1e3)
 exporter.export("my_circuit.cir", [xbar])
 ```
+
 
 ---
 

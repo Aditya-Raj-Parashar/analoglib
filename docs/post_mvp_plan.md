@@ -174,6 +174,7 @@ Handle weight matrices larger than a single crossbar tile. Expose **identical VM
 ### Primary Invariant Test (must pass before shipping)
 
 ```python
+# pseudocode - post-MVP roadmap verification
 W = np.random.randn(512, 256)
 x = np.random.randn(512)
 
@@ -216,6 +217,7 @@ analoglib/
 ### Effect ABC
 
 ```python
+# pseudocode - Effect ABC definition
 class Effect(ABC):
     def apply(self, g: np.ndarray, *, context: EffectContext) -> np.ndarray:
         ...
@@ -224,6 +226,7 @@ class Effect(ABC):
 ### Crossbar API change (additive, non-breaking)
 
 ```python
+# pseudocode - Crossbar API proposal
 # New optional parameter
 Crossbar(rows, cols, device=reram, effects=[IRDrop(r_wire=1.0), Thermal(T=350)])
 ```
@@ -357,6 +360,7 @@ analog info model.analog
 ## Target Vision: End-to-End Researcher Workflow
 
 ```python
+# pseudocode - post-MVP target vision
 import analoglib as al
 
 model = al.import_model("mnist.onnx")

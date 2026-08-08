@@ -60,6 +60,7 @@ Represents an individual computational step in the network.
 The lowering pass converts an abstract `AIRGraph` into an executable `SimulationEngine`.
 
 ```python
+import analoglib as al
 from analoglib.air import lower, AIRGraph, AIRLayer, LayerType
 import numpy as np
 
@@ -72,15 +73,11 @@ g.add_layer(AIRLayer(
     weights=np.random.randn(128, 64),
 ))
 
-# 2. Lower graph to SimulationEngine
-engine = lower(
-    g,
-    device=al.ReRAM(g_min=1e-6, g_max=100e-6, num_states=256),
-    adc_bits=8,
-    dac_bits=8,
-)
+# 2. Lower graph to SimulationEngine (quantize=True)
+engine = lower(g, quantize=True)
 
 # 3. Run simulation
+x = np.random.uniform(0, 1, 128)
 output = engine.run(x, mode="hardware")
 ```
 
@@ -112,13 +109,12 @@ model.compile(
     device=al.ReRAM(g_min=1e-6, g_max=100e-6, num_states=256, read_noise_sigma=0.01),
     adc_bits=8,
     dac_bits=8,
-    r_wire=1.0,      # IR Drop effect
-    E_a=0.1,         # Thermal effect
-    nu=0.05,         # Retention drift effect
 )
 
+x_input = np.random.uniform(0, 1, 784)
 result = model.simulate(x_input, mode="hardware")
 
 # Print hardware profiling & error analysis report
 result.report()
 ```
+

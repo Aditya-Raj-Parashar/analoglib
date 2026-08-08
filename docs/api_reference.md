@@ -7,17 +7,18 @@ Complete reference for every package, module, class, function, parameter, return
 ## Table of Contents
 1. [`analoglib` Top-Level Package](#1-analoglib-top-level-package)
 2. [`analoglib.air` — Analog Intermediate Representation](#2-analoglibair-analog-intermediate-representation)
-3. [`analoglib.crossbar` — Crossbars & Tiling](#3-analoglibcrossbar-crossbars--tiling)
-4. [`analoglib.devices` — ReRAM & Memristive Devices](#4-analoglibdevices-reram--memristive-devices)
+3. [`analoglib.crossbar` — Crossbars & Tiling](#3-analoglibcrossbar-crossbars-tiling)
+4. [`analoglib.devices` — ReRAM & Memristive Devices](#4-analoglibdevices-reram-memristive-devices)
 5. [`analoglib.effects` — Physical Non-Idealities](#5-analoglibeffects-physical-non-idealities)
-6. [`analoglib.mapping` — Weight Conductance Mapping](#6-analoglibmapping-weight-conductance-mapping)
-7. [`analoglib.adc_dac` — Quantized Peripheral Converters](#7-analoglibadc_dac-quantized-peripheral-converters)
+6. [`analoglib.mapping` — Weight Conductance Mapping](#6-analoglibmapping-weight-to-conductance-mapping)
+7. [`analoglib.adc_dac` — Quantized Peripheral Converters](#7-analoglibadc_dac-peripheral-converters)
 8. [`analoglib.simulation` — Execution Engine](#8-analoglibsimulation-execution-engine)
-9. [`analoglib.analysis` — Hardware Profiler & Analytics](#9-analoglibanalysis-hardware-profiler--analytics)
-10. [`analoglib.exporters` — SPICE Circuit Exporter](#10-analoglibexporters-spice-circuit-exporter)
+9. [`analoglib.analysis` — Hardware Profiler & Analytics](#9-analoglibanalysis-profiler-analytics)
+10. [`analoglib.exporters` — SPICE Circuit Exporter](#10-analoglibexporters-spice-netlist-exporter)
 11. [`analoglib.neural` — Model Converters](#11-analoglibneural-model-converters)
 12. [`analoglib.visualization` — Plotting Utilities](#12-analoglibvisualization-plotting-utilities)
 13. [`analoglib.cli` — Command Line Interface](#13-analoglibcli-command-line-interface)
+
 
 ---
 
