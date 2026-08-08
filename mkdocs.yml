@@ -1,8 +1,10 @@
 site_name: AnalogLib Documentation
+site_url: "https://Aditya-Raj-Parashar.github.io/analoglib/"
 site_description: "Open-source Python library for analog in-memory computing and neural network inference on resistive crossbars"
 site_author: "Aditya Raj Parashar"
 repo_url: "https://github.com/Aditya-Raj-Parashar/analoglib"
 repo_name: "Aditya-Raj-Parashar/analoglib"
+
 
 theme:
   name: material
@@ -46,8 +48,9 @@ markdown_extensions:
   - admonition
 
 extra_javascript:
-  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - javascripts/mathjax.js
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
 
 nav:
   - Home: index.md
