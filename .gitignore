@@ -54,7 +54,13 @@ Thumbs.db
 *.op.raw
 *.cir.out
 
-# Temporary / Scratch artifacts
+# Documentation build artifacts
+site/
+
+# Temporary / Test run artifacts
+*.cir
+*.analog
 /tmp/
 *.tmp
 *.bak
+
