@@ -1,0 +1,3434 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Open-source Python library for analog in-memory computing and neural network inference on resistive crossbars">
+      
+      
+        <meta name="author" content="Aditya Raj Parashar">
+      
+      
+        <link rel="canonical" href="https://Aditya-Raj-Parashar.github.io/analoglib/api_reference/">
+      
+      
+        <link rel="prev" href="../air_guide/">
+      
+      
+        <link rel="next" href="../core_concepts/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Full API Reference (Single Page) - AnalogLib Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#analoglib-api-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="AnalogLib Documentation" class="md-header__button md-logo" aria-label="AnalogLib Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AnalogLib Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Full API Reference (Single Page)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="cyan"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Aditya-Raj-Parashar/analoglib" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Aditya-Raj-Parashar/analoglib
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../capabilities/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Capabilities Matrix
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../faq/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  FAQ & AI Discoverability
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../concepts/analog-computing/" class="md-tabs__link">
+          
+  
+  
+  Concepts & Equations
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../devices/overview/" class="md-tabs__link">
+          
+  
+  
+  Physical Devices
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../models/numpy/" class="md-tabs__link">
+          
+  
+  
+  Framework Converters
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../simulation/overview/" class="md-tabs__link">
+          
+  
+  
+  Simulation & Hardware
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../serialization/analog-format/" class="md-tabs__link">
+          
+  
+  
+  File Format & Exporters
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../tutorials/mlp/" class="md-tabs__link">
+          
+  
+  
+  End-to-End Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../troubleshooting/common-errors/" class="md-tabs__link">
+          
+  
+  
+  Troubleshooting & Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../air_guide/" class="md-tabs__link">
+          
+  
+  
+  Specifications & Developer Notes
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AnalogLib Documentation" class="md-nav__button md-logo" aria-label="AnalogLib Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AnalogLib Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Aditya-Raj-Parashar/analoglib" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Aditya-Raj-Parashar/analoglib
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../capabilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Capabilities Matrix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ & AI Discoverability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quickstart (5-Min)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/first-vmm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    First VMM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts & Equations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Concepts & Equations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/analog-computing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analog Computing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/crossbars/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Crossbar Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/conductance-mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conductance Mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization & States
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/noise/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Device Noise & Faults
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/hardware-simulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware Simulation Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical Devices
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Physical Devices
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devices/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devices/reram/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ReRAM Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devices/device-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Devices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Framework Converters
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Framework Converters
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/numpy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NumPy Weights
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/pytorch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PyTorch Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/tensorflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TensorFlow / Keras
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/onnx/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ONNX Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulation & Hardware
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Simulation & Hardware
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulation/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulation/ideal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ideal Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulation/device/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Device Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulation/hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulation/dac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DAC Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulation/adc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADC Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    File Format & Exporters
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    File Format & Exporters
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serialization/analog-format/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    .analog Binary Format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exporters/spice/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SPICE Exporter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../analytics/profiler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analytics & Profiler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    End-to-End Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    End-to-End Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/mlp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Layer Perceptron (MLP)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/reram-vmm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ReRAM VMM Under Noise
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/noise-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization & Precision Sweeps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/hardware-pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware Pipeline & Profiling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting & Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Troubleshooting & Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/common-errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Common Errors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications & Developer Notes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Specifications & Developer Notes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../air_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AIR Architecture Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full API Reference (Single Page)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full API Reference (Single Page)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-analoglib-top-level-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. analoglib Top-Level Package
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. analoglib Top-Level Package">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#global-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global Functions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-analoglibair-analog-intermediate-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. analoglib.air (Analog Intermediate Representation)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. analoglib.air (Analog Intermediate Representation)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#airgraph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AIRGraph
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#airlayer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AIRLayer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lower-compiler-pass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lower Compiler Pass
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#analogmodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AnalogModel
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-analoglibcrossbar-crossbars-tiling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. analoglib.crossbar (Crossbars &amp; Tiling)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. analoglib.crossbar (Crossbars &amp; Tiling)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#crossbar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Crossbar
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tiledcrossbar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TiledCrossbar
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-analoglibdevices-reram-memristive-devices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. analoglib.devices (ReRAM &amp; Memristive Devices)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. analoglib.devices (ReRAM &amp; Memristive Devices)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#device-abstract-base-class" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Device (Abstract Base Class)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ReRAM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#idealdevice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IdealDevice
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-analoglibeffects-physical-non-idealities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. analoglib.effects (Physical Non-Idealities)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. analoglib.effects (Physical Non-Idealities)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#irdrop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IRDrop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#thermal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thermal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#drift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Drift
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-analoglibmapping-weight-to-conductance-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. analoglib.mapping (Weight-to-Conductance Mapping)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. analoglib.mapping (Weight-to-Conductance Mapping)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#differentialmapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DifferentialMapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#offsetmapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OffsetMapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-analoglibadc_dac-peripheral-converters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. analoglib.adc_dac (Peripheral Converters)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. analoglib.adc_dac (Peripheral Converters)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ADC
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dac" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DAC
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-analoglibsimulation-execution-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. analoglib.simulation (Execution Engine)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. analoglib.simulation (Execution Engine)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#simulationengine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SimulationEngine
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-analoglibanalysis-profiler-analytics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. analoglib.analysis (Profiler &amp; Analytics)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. analoglib.analysis (Profiler &amp; Analytics)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#analogprofiler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AnalogProfiler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#analogreport" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AnalogReport
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-analoglibexporters-spice-netlist-exporter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. analoglib.exporters (SPICE Netlist Exporter)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. analoglib.exporters (SPICE Netlist Exporter)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#spiceexporter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SpiceExporter
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-analoglibneural-model-converters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. analoglib.neural (Model Converters)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-analoglibvisualization-plotting-utilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. analoglib.visualization (Plotting Utilities)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-analoglibcli-command-line-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. analoglib.cli (Command Line Interface)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core_concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Concepts Specification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture & Design Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../post_mvp_plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Post-MVP Architecture Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DOCUMENTATION_COVERAGE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation Coverage & Audit Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-analoglib-top-level-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. analoglib Top-Level Package
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. analoglib Top-Level Package">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#global-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global Functions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-analoglibair-analog-intermediate-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. analoglib.air (Analog Intermediate Representation)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. analoglib.air (Analog Intermediate Representation)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#airgraph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AIRGraph
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#airlayer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AIRLayer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lower-compiler-pass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lower Compiler Pass
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#analogmodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AnalogModel
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-analoglibcrossbar-crossbars-tiling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. analoglib.crossbar (Crossbars &amp; Tiling)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. analoglib.crossbar (Crossbars &amp; Tiling)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#crossbar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Crossbar
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tiledcrossbar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TiledCrossbar
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-analoglibdevices-reram-memristive-devices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. analoglib.devices (ReRAM &amp; Memristive Devices)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. analoglib.devices (ReRAM &amp; Memristive Devices)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#device-abstract-base-class" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Device (Abstract Base Class)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ReRAM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#idealdevice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IdealDevice
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-analoglibeffects-physical-non-idealities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. analoglib.effects (Physical Non-Idealities)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. analoglib.effects (Physical Non-Idealities)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#irdrop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IRDrop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#thermal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thermal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#drift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Drift
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-analoglibmapping-weight-to-conductance-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. analoglib.mapping (Weight-to-Conductance Mapping)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. analoglib.mapping (Weight-to-Conductance Mapping)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#differentialmapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DifferentialMapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#offsetmapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OffsetMapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-analoglibadc_dac-peripheral-converters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. analoglib.adc_dac (Peripheral Converters)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. analoglib.adc_dac (Peripheral Converters)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ADC
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dac" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DAC
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-analoglibsimulation-execution-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. analoglib.simulation (Execution Engine)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. analoglib.simulation (Execution Engine)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#simulationengine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SimulationEngine
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-analoglibanalysis-profiler-analytics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. analoglib.analysis (Profiler &amp; Analytics)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. analoglib.analysis (Profiler &amp; Analytics)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#analogprofiler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AnalogProfiler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#analogreport" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AnalogReport
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-analoglibexporters-spice-netlist-exporter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. analoglib.exporters (SPICE Netlist Exporter)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. analoglib.exporters (SPICE Netlist Exporter)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#spiceexporter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SpiceExporter
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-analoglibneural-model-converters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. analoglib.neural (Model Converters)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-analoglibvisualization-plotting-utilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. analoglib.visualization (Plotting Utilities)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-analoglibcli-command-line-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. analoglib.cli (Command Line Interface)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="analoglib-api-reference">AnalogLib API Reference</h1>
+<p>Complete reference for every package, module, class, function, parameter, return type, and exception in <code>analoglib</code>.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#1-analoglib-top-level-package"><code>analoglib</code> Top-Level Package</a></li>
+<li><a href="#2-analoglibair-analog-intermediate-representation"><code>analoglib.air</code> — Analog Intermediate Representation</a></li>
+<li><a href="#3-analoglibcrossbar-crossbars-tiling"><code>analoglib.crossbar</code> — Crossbars &amp; Tiling</a></li>
+<li><a href="#4-analoglibdevices-reram-memristive-devices"><code>analoglib.devices</code> — ReRAM &amp; Memristive Devices</a></li>
+<li><a href="#5-analoglibeffects-physical-non-idealities"><code>analoglib.effects</code> — Physical Non-Idealities</a></li>
+<li><a href="#6-analoglibmapping-weight-to-conductance-mapping"><code>analoglib.mapping</code> — Weight Conductance Mapping</a></li>
+<li><a href="#7-analoglibadc_dac-peripheral-converters"><code>analoglib.adc_dac</code> — Quantized Peripheral Converters</a></li>
+<li><a href="#8-analoglibsimulation-execution-engine"><code>analoglib.simulation</code> — Execution Engine</a></li>
+<li><a href="#9-analoglibanalysis-profiler-analytics"><code>analoglib.analysis</code> — Hardware Profiler &amp; Analytics</a></li>
+<li><a href="#10-analoglibexporters-spice-netlist-exporter"><code>analoglib.exporters</code> — SPICE Circuit Exporter</a></li>
+<li><a href="#11-analoglibneural-model-converters"><code>analoglib.neural</code> — Model Converters</a></li>
+<li><a href="#12-analoglibvisualization-plotting-utilities"><code>analoglib.visualization</code> — Plotting Utilities</a></li>
+<li><a href="#13-analoglibcli-command-line-interface"><code>analoglib.cli</code> — Command Line Interface</a></li>
+</ol>
+<hr />
+<h2 id="1-analoglib-top-level-package">1. <code>analoglib</code> Top-Level Package</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">analoglib</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">al</span>
+</code></pre></div>
+<h3 id="global-functions">Global Functions</h3>
+<ul>
+<li><code>al.save(filepath: str, crossbars: List[Crossbar], meta: Dict[str, Any] = None) -&gt; None</code>: Serializes crossbar models to encrypted <code>.analog</code> binary format (AES-256-GCM + MsgPack).</li>
+<li><code>al.load(filepath: str) -&gt; Dict[str, Any]</code>: Loads and decrypts <code>.analog</code> file, returning dictionary with keys <code>"crossbars"</code> and <code>"meta"</code>.</li>
+<li><code>al.set_seed(seed: int) -&gt; None</code>: Sets global random seed for reproducibility across device noise models and variation.</li>
+</ul>
+<hr />
+<h2 id="2-analoglibair-analog-intermediate-representation">2. <code>analoglib.air</code> (Analog Intermediate Representation)</h2>
+<h3 id="airgraph"><code>AIRGraph</code></h3>
+<ul>
+<li><code>AIRGraph(name: str = "model", description: str = "")</code>: Graph schema representing an analog neural network.</li>
+<li><code>.add_layer(layer: AIRLayer) -&gt; AIRGraph</code>: Append layer.</li>
+<li><code>.get_layer(name: str) -&gt; AIRLayer</code>: Lookup layer by name.</li>
+<li><code>.validate() -&gt; None</code>: Verify graph structural invariants.</li>
+<li><code>.to_dict() -&gt; Dict[str, Any]</code>: Export graph as dictionary.</li>
+<li><code>.from_dict(d: Dict[str, Any]) -&gt; AIRGraph</code>: Load graph from dictionary.</li>
+</ul>
+<h3 id="airlayer"><code>AIRLayer</code></h3>
+<ul>
+<li><code>AIRLayer(layer_type: LayerType, name: str, matrix_shape: Tuple[int, int] = None, weights: np.ndarray = None, activation_fn: ActivationFn = None, peripherals: PeripheralConfig = None, effects: List[EffectConfig] = None)</code>: Node in AIRGraph.</li>
+</ul>
+<h3 id="lower-compiler-pass"><code>lower</code> Compiler Pass</h3>
+<ul>
+<li><code>al.lower(air_graph: AIRGraph, device: Device = None, adc_bits: int = None, dac_bits: int = None, quantize: bool = True) -&gt; SimulationEngine</code>: Compiles AIRGraph into an executable <code>SimulationEngine</code>.</li>
+</ul>
+<h3 id="analogmodel"><code>AnalogModel</code></h3>
+<ul>
+<li><code>AnalogModel(air_graph: AIRGraph)</code>: High-level model wrapper.</li>
+<li><code>AnalogModel.from_numpy(weights: List[np.ndarray], activations: List[str] = None) -&gt; AnalogModel</code>: Factory from NumPy weight matrices.</li>
+<li><code>AnalogModel.from_torch(module: nn.Module) -&gt; AnalogModel</code>: Factory from PyTorch model.</li>
+<li><code>.compile(...) -&gt; AnalogModel</code>: Target specific physical devices and peripherals.</li>
+<li><code>.simulate(x: np.ndarray, mode: str = "ideal") -&gt; SimulationResult</code>: Run inference.</li>
+</ul>
+<hr />
+<h2 id="3-analoglibcrossbar-crossbars-tiling">3. <code>analoglib.crossbar</code> (Crossbars &amp; Tiling)</h2>
+<h3 id="crossbar"><code>Crossbar</code></h3>
+<ul>
+<li><code>Crossbar(rows: int, cols: int, device: Device = None, mapping: MappingStrategy = None, differential: bool = True, effects: List[Effect] = None)</code>: Single crossbar array engine.</li>
+<li><code>.load_weights(W: np.ndarray, quantize: bool = True) -&gt; None</code>: Map weights to physical conductances <span class="arithmatex">\(G^+\)</span> and <span class="arithmatex">\(G^-\)</span>.</li>
+<li><code>.vmm(V: np.ndarray, noise: bool = False, mode: SimulationMode = "ideal") -&gt; np.ndarray</code>: Execute vector-matrix multiplication <span class="arithmatex">\(I = V \cdot (G^+ - G^-)\)</span>.</li>
+<li><code>.reconstruct_weights() -&gt; np.ndarray</code>: Extract effective stored weights.</li>
+<li><code>.get_conductance() -&gt; Tuple[np.ndarray, np.ndarray]</code>: Return raw <span class="arithmatex">\(G^+\)</span> and <span class="arithmatex">\(G^-\)</span> matrices.</li>
+</ul>
+<h3 id="tiledcrossbar"><code>TiledCrossbar</code></h3>
+<ul>
+<li><code>TiledCrossbar(rows: int, cols: int, tile_rows: int, tile_cols: int, device: Device = None, mapping: MappingStrategy = None)</code>: Grid of physical crossbars for large matrices.</li>
+<li><code>TiledCrossbar.from_matrix(W: np.ndarray, tile_shape: Tuple[int, int], ...)</code>: Factory method.</li>
+<li><code>.vmm(V: np.ndarray, noise: bool = False, mode: SimulationMode = "ideal") -&gt; np.ndarray</code>: Computes tiled VMM with automatic global <span class="arithmatex">\(w_{\text{max}}\)</span> scaling across tiles.</li>
+</ul>
+<hr />
+<h2 id="4-analoglibdevices-reram-memristive-devices">4. <code>analoglib.devices</code> (ReRAM &amp; Memristive Devices)</h2>
+<h3 id="device-abstract-base-class"><code>Device</code> (Abstract Base Class)</h3>
+<ul>
+<li>Abstract methods: <code>.g_range</code>, <code>.quantize(g)</code>, <code>.add_noise(g)</code>, <code>.to_dict()</code>, <code>from_dict(d)</code>.</li>
+</ul>
+<h3 id="reram"><code>ReRAM</code></h3>
+<ul>
+<li><code>ReRAM(g_min: float = 1e-6, g_max: float = 100e-6, num_states: int = 256, read_noise_sigma: float = 0.0, device_variation_sigma: float = 0.0)</code>: Realistic ReRAM device model.</li>
+</ul>
+<h3 id="idealdevice"><code>IdealDevice</code></h3>
+<ul>
+<li><code>IdealDevice()</code>: Unquantized, noise-free baseline device (<span class="arithmatex">\(G \in [0, 1]\)</span> Siemens).</li>
+</ul>
+<hr />
+<h2 id="5-analoglibeffects-physical-non-idealities">5. <code>analoglib.effects</code> (Physical Non-Idealities)</h2>
+<h3 id="irdrop"><code>IRDrop</code></h3>
+<ul>
+<li><code>IRDrop(r_wire: float = 1.0)</code>: Parasitic wire resistance IR drop effect along wordlines and bitlines.</li>
+</ul>
+<h3 id="thermal"><code>Thermal</code></h3>
+<ul>
+<li><code>Thermal(E_a: float = 0.1, T_ref: float = 300.0)</code>: Arrhenius temperature-dependent conductance scaling <span class="arithmatex">\(G(T)\)</span>.</li>
+</ul>
+<h3 id="drift"><code>Drift</code></h3>
+<ul>
+<li><code>Drift(nu: float = 0.05, t_0: float = 1.0)</code>: Power-law retention loss <span class="arithmatex">\(G(t) = G_0 (t/t_0)^{-\nu}\)</span>.</li>
+</ul>
+<hr />
+<h2 id="6-analoglibmapping-weight-to-conductance-mapping">6. <code>analoglib.mapping</code> (Weight-to-Conductance Mapping)</h2>
+<h3 id="differentialmapping"><code>DifferentialMapping</code></h3>
+<ul>
+<li><code>DifferentialMapping(w_max: float = None)</code>: Maps signed weights to differential pairs <span class="arithmatex">\((G^+, G^-)\)</span>.</li>
+</ul>
+<h3 id="offsetmapping"><code>OffsetMapping</code></h3>
+<ul>
+<li><code>OffsetMapping(w_max: float = None)</code>: Maps signed weights to single conductance with reference zero-offset.</li>
+</ul>
+<hr />
+<h2 id="7-analoglibadc_dac-peripheral-converters">7. <code>analoglib.adc_dac</code> (Peripheral Converters)</h2>
+<h3 id="adc"><code>ADC</code></h3>
+<ul>
+<li><code>ADC(bits: int = 8, v_min: float = -500e-6, v_max: float = 500e-6)</code>: Uniform linear ADC quantization.</li>
+</ul>
+<h3 id="dac"><code>DAC</code></h3>
+<ul>
+<li><code>DAC(bits: int = 8, v_min: float = 0.0, v_max: float = 1.0)</code>: Uniform linear DAC quantization.</li>
+</ul>
+<hr />
+<h2 id="8-analoglibsimulation-execution-engine">8. <code>analoglib.simulation</code> (Execution Engine)</h2>
+<h3 id="simulationengine"><code>SimulationEngine</code></h3>
+<ul>
+<li><code>SimulationEngine(crossbars: List[Crossbar], adc: ADC = None, dac: DAC = None)</code>: Multi-layer crossbar simulation pipeline.</li>
+<li><code>.run(V: np.ndarray, mode: str = "ideal") -&gt; np.ndarray</code>: Run multi-layer inference in <code>"ideal"</code>, <code>"device"</code>, or <code>"hardware"</code> mode.</li>
+</ul>
+<hr />
+<h2 id="9-analoglibanalysis-profiler-analytics">9. <code>analoglib.analysis</code> (Profiler &amp; Analytics)</h2>
+<h3 id="analogprofiler"><code>AnalogProfiler</code></h3>
+<ul>
+<li><code>AnalogProfiler(t_read: float = 10e-9, cell_feature_F: float = 10.0, V_supply: float = 1.0)</code>: Analyzes physical metrics.</li>
+<li><code>.profile(crossbars: List[Crossbar], V_input: np.ndarray, adc: ADC = None, dac: DAC = None) -&gt; AnalogReport</code>: Computes array power, read energy, ADC/DAC energy, area, latency, and TOPS/W.</li>
+</ul>
+<h3 id="analogreport"><code>AnalogReport</code></h3>
+<ul>
+<li>Data class containing performance metrics and <code>.summary()</code> / <code>.print()</code> reporting methods.</li>
+</ul>
+<hr />
+<h2 id="10-analoglibexporters-spice-netlist-exporter">10. <code>analoglib.exporters</code> (SPICE Netlist Exporter)</h2>
+<h3 id="spiceexporter"><code>SpiceExporter</code></h3>
+<ul>
+<li><code>SpiceExporter(dialect: str = "ngspice", R_load: float = 1e3, V_dd: float = 1.0)</code>: Converts crossbar models to SPICE netlists.</li>
+<li><code>.export(path: str, crossbars: List[Crossbar], V_inputs: np.ndarray = None) -&gt; Path</code>: Writes <code>.cir</code> file.</li>
+<li><code>.export_str(crossbars: List[Crossbar]) -&gt; str</code>: Returns netlist string.</li>
+</ul>
+<hr />
+<h2 id="11-analoglibneural-model-converters">11. <code>analoglib.neural</code> (Model Converters)</h2>
+<ul>
+<li><code>from_numpy(weights: List[np.ndarray], activations: List[str] = None) -&gt; AIRGraph</code></li>
+<li><code>from_torch(module: nn.Module) -&gt; AIRGraph</code></li>
+</ul>
+<hr />
+<h2 id="12-analoglibvisualization-plotting-utilities">12. <code>analoglib.visualization</code> (Plotting Utilities)</h2>
+<ul>
+<li><code>plot_conductance_matrix(crossbar, save_path: str = None)</code></li>
+<li><code>plot_weight_error_histogram(W_orig, W_recon, save_path: str = None)</code></li>
+<li><code>plot_noise_sweep(sigmas, snr_db, save_path: str = None)</code></li>
+<li><code>plot_adc_precision_sweep(bits_list, sqnr_db, save_path: str = None)</code></li>
+</ul>
+<hr />
+<h2 id="13-analoglibcli-command-line-interface">13. <code>analoglib.cli</code> (Command Line Interface)</h2>
+<ul>
+<li><code>analog info &lt;file.analog&gt;</code></li>
+<li><code>analog simulate &lt;file.analog&gt; [--mode ideal|device|hardware]</code></li>
+<li><code>analog profile &lt;file.analog&gt;</code></li>
+<li><code>analog export-spice &lt;file.analog&gt; [--out circuit.cir]</code></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,3899 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Open-source Python library for analog in-memory computing and neural network inference on resistive crossbars">
+      
+      
+        <meta name="author" content="Aditya Raj Parashar">
+      
+      
+        <link rel="canonical" href="https://Aditya-Raj-Parashar.github.io/analoglib/post_mvp_plan/">
+      
+      
+        <link rel="prev" href="../getting_started/">
+      
+      
+        <link rel="next" href="../DOCUMENTATION_COVERAGE/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Post-MVP Architecture Plan - AnalogLib Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#analoglib-post-mvp-architecture-implementation-roadmap-v2" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="AnalogLib Documentation" class="md-header__button md-logo" aria-label="AnalogLib Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AnalogLib Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Post-MVP Architecture Plan
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="cyan"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Aditya-Raj-Parashar/analoglib" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Aditya-Raj-Parashar/analoglib
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../capabilities/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Capabilities Matrix
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../faq/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  FAQ & AI Discoverability
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../concepts/analog-computing/" class="md-tabs__link">
+          
+  
+  
+  Concepts & Equations
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../devices/overview/" class="md-tabs__link">
+          
+  
+  
+  Physical Devices
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../models/numpy/" class="md-tabs__link">
+          
+  
+  
+  Framework Converters
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../simulation/overview/" class="md-tabs__link">
+          
+  
+  
+  Simulation & Hardware
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../serialization/analog-format/" class="md-tabs__link">
+          
+  
+  
+  File Format & Exporters
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../tutorials/mlp/" class="md-tabs__link">
+          
+  
+  
+  End-to-End Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../troubleshooting/common-errors/" class="md-tabs__link">
+          
+  
+  
+  Troubleshooting & Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../air_guide/" class="md-tabs__link">
+          
+  
+  
+  Specifications & Developer Notes
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AnalogLib Documentation" class="md-nav__button md-logo" aria-label="AnalogLib Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AnalogLib Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Aditya-Raj-Parashar/analoglib" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Aditya-Raj-Parashar/analoglib
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../capabilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Capabilities Matrix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ & AI Discoverability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quickstart (5-Min)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/first-vmm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    First VMM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts & Equations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Concepts & Equations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/analog-computing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analog Computing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/crossbars/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Crossbar Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/conductance-mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conductance Mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization & States
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/noise/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Device Noise & Faults
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/hardware-simulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware Simulation Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical Devices
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Physical Devices
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devices/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devices/reram/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ReRAM Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devices/device-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Devices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Framework Converters
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Framework Converters
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/numpy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NumPy Weights
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/pytorch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PyTorch Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/tensorflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TensorFlow / Keras
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/onnx/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ONNX Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulation & Hardware
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Simulation & Hardware
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulation/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulation/ideal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ideal Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulation/device/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Device Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulation/hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulation/dac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DAC Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulation/adc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADC Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    File Format & Exporters
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    File Format & Exporters
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serialization/analog-format/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    .analog Binary Format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exporters/spice/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SPICE Exporter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../analytics/profiler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analytics & Profiler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    End-to-End Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    End-to-End Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/mlp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Layer Perceptron (MLP)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/reram-vmm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ReRAM VMM Under Noise
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/noise-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization & Precision Sweeps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/hardware-pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware Pipeline & Profiling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting & Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Troubleshooting & Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/common-errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Common Errors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications & Developer Notes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Specifications & Developer Notes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../air_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AIR Architecture Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api_reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full API Reference (Single Page)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core_concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Concepts Specification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture & Design Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Post-MVP Architecture Plan
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Post-MVP Architecture Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#system-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interface-contract-freeze-before-implementing-any-phase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface Contract (Freeze Before Implementing Any Phase)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependency-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependency Order
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-1-air-core-schema-analoglibair" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: AIR Core Schema (analoglib.air)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 1: AIR Core Schema (analoglib.air)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-11-airgraph-and-airlayer-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 1.1: AIRGraph and AIRLayer schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-12-air-crossbar-lowering-pass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 1.2: AIR → Crossbar Lowering Pass
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-13-analogmodel-high-level-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 1.3: AnalogModel high-level API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#air-yaml-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AIR YAML Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-2-model-converters-analoglibneural" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: Model Converters (analoglib.neural)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 2: Model Converters (analoglib.neural)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goal_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation-order-within-phase-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation order within Phase 2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-21-pytorch-converter-analoglibneuraltorch_converter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 2.1: PyTorch Converter (analoglib.neural.torch_converter)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-22-tensorflow-converter-analoglibneuraltf_converter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 2.2: TensorFlow Converter (analoglib.neural.tf_converter)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-23-onnx-importer-analoglibneuralonnx_importer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 2.3: ONNX Importer (analoglib.neural.onnx_importer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-3-tiledcrossbar-analoglibcrossbartiled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: TiledCrossbar (analoglib.crossbar.tiled)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 3: TiledCrossbar (analoglib.crossbar.tiled)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goal_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#primary-invariant-test-must-pass-before-shipping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Primary Invariant Test (must pass before shipping)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-31-tiledcrossbar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 3.1: TiledCrossbar
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-32-air-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 3.2: AIR integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-4-hardware-effects-analoglibeffects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: Hardware Effects (analoglib.effects)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 4: Hardware Effects (analoglib.effects)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goal_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-module-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New module layout
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#effect-abc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Effect ABC
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#crossbar-api-change-additive-non-breaking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Crossbar API change (additive, non-breaking)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-41-effect-abc-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 4.1: Effect ABC + registry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-42-ir-drop-most-valuable-implement-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 4.2: IR Drop (most valuable, implement first)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-43-thermal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 4.3: Thermal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-44-temporal-drift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 4.4: Temporal Drift
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-5-analytics-analoglibanalysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5: Analytics (analoglib.analysis)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 5: Analytics (analoglib.analysis)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-metrics-to-track-internally" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core metrics to track internally
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correct-power-formula-ir-drop-aware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correct power formula (IR drop-aware)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-51-analogprofiler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 5.1: AnalogProfiler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-52-area-estimator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 5.2: Area estimator
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-6-exporters-analoglibexporters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6: Exporters (analoglib.exporters)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 6: Exporters (analoglib.exporters)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goal-air-circuit-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goal: AIR → circuit representation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spice-dialect-support-order-implement-and-validate-individually" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SPICE dialect support order (implement and validate individually)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-61-spiceexporter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 6.1: SpiceExporter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-62-verilog-a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 6.2: Verilog-A
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-7-visualization-analoglibvisualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 7: Visualization (analoglib.visualization)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 7: Visualization (analoglib.visualization)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-71-core-plot-api-analoglibvisualizationplots" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 7.1: Core plot API (analoglib.visualization.plots)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-72-interactive-dashboard-after-api-freeze" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 7.2: Interactive dashboard (after API freeze)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-8-cli-analoglibcli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 8: CLI (analoglib.cli)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 8: CLI (analoglib.cli)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-81-cli-entry-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 8.1: CLI entry point
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#target-vision-end-to-end-researcher-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Target Vision: End-to-End Researcher Workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DOCUMENTATION_COVERAGE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation Coverage & Audit Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#system-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interface-contract-freeze-before-implementing-any-phase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface Contract (Freeze Before Implementing Any Phase)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependency-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependency Order
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-1-air-core-schema-analoglibair" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: AIR Core Schema (analoglib.air)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 1: AIR Core Schema (analoglib.air)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-11-airgraph-and-airlayer-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 1.1: AIRGraph and AIRLayer schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-12-air-crossbar-lowering-pass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 1.2: AIR → Crossbar Lowering Pass
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-13-analogmodel-high-level-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 1.3: AnalogModel high-level API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#air-yaml-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AIR YAML Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-2-model-converters-analoglibneural" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: Model Converters (analoglib.neural)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 2: Model Converters (analoglib.neural)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goal_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation-order-within-phase-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation order within Phase 2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-21-pytorch-converter-analoglibneuraltorch_converter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 2.1: PyTorch Converter (analoglib.neural.torch_converter)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-22-tensorflow-converter-analoglibneuraltf_converter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 2.2: TensorFlow Converter (analoglib.neural.tf_converter)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-23-onnx-importer-analoglibneuralonnx_importer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 2.3: ONNX Importer (analoglib.neural.onnx_importer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-3-tiledcrossbar-analoglibcrossbartiled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: TiledCrossbar (analoglib.crossbar.tiled)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 3: TiledCrossbar (analoglib.crossbar.tiled)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goal_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#primary-invariant-test-must-pass-before-shipping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Primary Invariant Test (must pass before shipping)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-31-tiledcrossbar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 3.1: TiledCrossbar
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-32-air-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 3.2: AIR integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-4-hardware-effects-analoglibeffects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: Hardware Effects (analoglib.effects)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 4: Hardware Effects (analoglib.effects)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goal_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-module-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New module layout
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#effect-abc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Effect ABC
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#crossbar-api-change-additive-non-breaking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Crossbar API change (additive, non-breaking)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-41-effect-abc-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 4.1: Effect ABC + registry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-42-ir-drop-most-valuable-implement-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 4.2: IR Drop (most valuable, implement first)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-43-thermal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 4.3: Thermal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-44-temporal-drift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 4.4: Temporal Drift
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-5-analytics-analoglibanalysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5: Analytics (analoglib.analysis)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 5: Analytics (analoglib.analysis)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-metrics-to-track-internally" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core metrics to track internally
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correct-power-formula-ir-drop-aware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correct power formula (IR drop-aware)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-51-analogprofiler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 5.1: AnalogProfiler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-52-area-estimator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 5.2: Area estimator
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-6-exporters-analoglibexporters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6: Exporters (analoglib.exporters)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 6: Exporters (analoglib.exporters)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goal-air-circuit-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goal: AIR → circuit representation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spice-dialect-support-order-implement-and-validate-individually" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SPICE dialect support order (implement and validate individually)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-61-spiceexporter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 6.1: SpiceExporter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-62-verilog-a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 6.2: Verilog-A
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-7-visualization-analoglibvisualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 7: Visualization (analoglib.visualization)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 7: Visualization (analoglib.visualization)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-71-core-plot-api-analoglibvisualizationplots" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 7.1: Core plot API (analoglib.visualization.plots)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-72-interactive-dashboard-after-api-freeze" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 7.2: Interactive dashboard (after API freeze)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-8-cli-analoglibcli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 8: CLI (analoglib.cli)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 8: CLI (analoglib.cli)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-81-cli-entry-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 8.1: CLI entry point
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#target-vision-end-to-end-researcher-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Target Vision: End-to-End Researcher Workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="analoglib-post-mvp-architecture-implementation-roadmap-v2">AnalogLib — Post-MVP Architecture &amp; Implementation Roadmap (v2)</h1>
+<blockquote>
+<p><strong>Key architectural change from v1</strong>: AIR (Analog Intermediate Representation) is the <strong>central contract</strong> of the post-MVP system, not a final phase. All converters, simulators, exporters, and analyzers speak AIR. This avoids converter proliferation and enforces a clean dependency graph.</p>
+</blockquote>
+<hr />
+<h2 id="system-architecture">System Architecture</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>                     ┌─────────────────────────┐
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                     │  PyTorch / TF / ONNX     │
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                     └───────────┬─────────────┘
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                                 ↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>                     ┌─────────────────────────┐
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                     │    Model Converters       │
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                     └───────────┬─────────────┘
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                                 ↓
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                     ┌─────────────────────────┐
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                     │           AIR            │
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>                     │  Analog Intermediate     │
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>                     │  Representation          │
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>                     └───────────┬─────────────┘
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>                                 ↓
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>                  ┌──────────────┴──────────────┐
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>                  ↓                             ↓
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>           Crossbar                     TiledCrossbar
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>                  │                             │
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>                  └──────────────┬──────────────┘
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>                                 ↓
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>                       Hardware Effects Pipeline
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>              ┌──────────────────┼──────────────────┐
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>              ↓                  ↓                  ↓
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>           IR Drop            Thermal           Drift/Noise
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>              └──────────────────┼──────────────────┘
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>                                 ↓
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>                     ┌─────────────────────────┐
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>                     │    Simulation Engine      │
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>                     │   Ideal / Device / HW    │
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>                     └───────────┬─────────────┘
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>                                 ↓
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>                  ┌──────────────┼──────────────┐
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>                  ↓              ↓              ↓
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>              Analytics    Visualization      Export
+<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>               Power/Area    Dashboard     SPICE / VA
+<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>                  └──────────────┼──────────────┘
+<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>                                 ↓
+<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>                               CLI
+</code></pre></div>
+<hr />
+<h2 id="interface-contract-freeze-before-implementing-any-phase">Interface Contract (Freeze Before Implementing Any Phase)</h2>
+<blockquote>
+<p><strong>Before starting Phase 1</strong>, the coding implementation must honor these interface contracts. This prevents rewriting Phase 1 code at Phase 3 when exporters and tiled arrays are added.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Interface</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Device</code></td>
+<td>Analog memory cell (already implemented)</td>
+</tr>
+<tr>
+<td><code>MappingStrategy</code></td>
+<td>Weight ↔ conductance (already implemented)</td>
+</tr>
+<tr>
+<td><code>Effect</code></td>
+<td>Pluggable physical effect applied before/during VMM</td>
+</tr>
+<tr>
+<td><code>Crossbar</code></td>
+<td>Single-array VMM engine (already implemented)</td>
+</tr>
+<tr>
+<td><code>TiledCrossbar</code></td>
+<td>Multi-tile VMM, exposes same <code>.vmm()</code> interface</td>
+</tr>
+<tr>
+<td><code>SimulationEngine</code></td>
+<td>Orchestrates layers + effects + peripherals</td>
+</tr>
+<tr>
+<td><code>SimulationMode</code></td>
+<td>Ideal / Device / Hardware / SPICE (already implemented)</td>
+</tr>
+<tr>
+<td><code>AIRGraph</code></td>
+<td>Framework-neutral model graph</td>
+</tr>
+<tr>
+<td><code>AIRLayer</code></td>
+<td>Node in AIRGraph (Crossbar, Activation, etc.)</td>
+</tr>
+<tr>
+<td><code>AnalogModel</code></td>
+<td>High-level user-facing model wrapping AIR</td>
+</tr>
+<tr>
+<td><code>Exporter</code></td>
+<td>Produces SPICE/Verilog-A from AIR</td>
+</tr>
+<tr>
+<td><code>Analyzer</code></td>
+<td>Computes power/area/latency from simulation results</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="dependency-order">Dependency Order</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Phase 0 (done):   Core MVP — Device, Mapping, Crossbar, Engine, Serialization
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Phase 1:          AIR Core Schema (defines all future interfaces)
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>Phase 2:          Model Converters (PyTorch, TF, ONNX → AIR)
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>Phase 3:          TiledCrossbar (AIR → tiled execution)
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>Phase 4:          Hardware Effects (IR Drop, Thermal, Drift as pluggable Effects)
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>Phase 5:          Analytics (power, area, latency — consumes simulation results)
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>Phase 6:          Exporters (AIR → SPICE, Verilog-A)
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>Phase 7:          Visualization Dashboard
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>Phase 8:          CLI
+</code></pre></div>
+<hr />
+<h2 id="phase-1-air-core-schema-analoglibair">Phase 1: AIR Core Schema (<code>analoglib.air</code>)</h2>
+<h3 id="goal">Goal</h3>
+<p>Define the intermediate representation of an analog hardware graph. All converters and exporters target this — not raw <code>Crossbar</code> objects. The schema replaces the need for N separate framework-specific paths.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>PyTorch ──┐
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>ONNX ─────┼──→  AIR  ──→  Crossbar / TiledCrossbar / SPICE / CLI
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>TensorFlow┘
+</code></pre></div>
+<h3 id="task-11-airgraph-and-airlayer-schema">Task 1.1: <code>AIRGraph</code> and <code>AIRLayer</code> schema</h3>
+<ul>
+<li>[ ] Define <code>AIRLayer</code> types: <code>CrossbarLayer</code>, <code>ActivationLayer</code>, <code>InlineLayer</code></li>
+<li>[ ] Define YAML/dict schema: <code>matrix</code>, <code>device</code>, <code>mapping</code>, <code>tiles</code>, <code>peripherals</code>, <code>effects</code>, <code>simulation_config</code></li>
+<li>[ ] Implement <code>AIRGraph</code> container with ordered layer list and metadata</li>
+<li>[ ] Implement <code>AIRGraph.to_dict()</code> / <code>AIRGraph.from_dict()</code> serialization</li>
+</ul>
+<h3 id="task-12-air-crossbar-lowering-pass">Task 1.2: AIR → Crossbar Lowering Pass</h3>
+<ul>
+<li>[ ] Implement <code>air.lower(air_graph) → list[Crossbar | TiledCrossbar]</code></li>
+<li>[ ] Populate <code>SimulationEngine</code> from a lowered AIR graph</li>
+<li>[ ] Write invariant test: <code>lower(to_air(W)).vmm(x) ≈ W @ x</code></li>
+</ul>
+<h3 id="task-13-analogmodel-high-level-api">Task 1.3: <code>AnalogModel</code> high-level API</h3>
+<ul>
+<li>[ ] Implement <code>AnalogModel</code> wrapping an <code>AIRGraph</code> with <code>.compile()</code>, <code>.simulate()</code>, <code>.report()</code>, <code>.save()</code> / <code>.load()</code> methods</li>
+<li>[ ] <code>.compile(device=..., tile=..., mapping=..., ...)</code> produces a lowered <code>SimulationEngine</code></li>
+<li>[ ] <code>.simulate(mode=..., effects=..., adc_bits=..., dac_bits=...)</code> runs the engine</li>
+<li>[ ] <code>.report()</code> prints structured hardware summary</li>
+</ul>
+<h3 id="air-yaml-example">AIR YAML Example</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">model</span><span class="p">:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mlp</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nt">layers</span><span class="p">:</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">crossbar</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="nt">matrix</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">128</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">256</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ReRAM</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span><span class="nt">mapping</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">differential</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="nt">tiles</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">128</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">128</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="nt">peripherals</span><span class="p">:</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">      </span><span class="nt">dac</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">bits</span><span class="p">:</span><span class="w"> </span><span class="nv">8</span><span class="p p-Indicator">}</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">      </span><span class="nt">adc</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">bits</span><span class="p">:</span><span class="w"> </span><span class="nv">8</span><span class="p p-Indicator">}</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">    </span><span class="nt">effects</span><span class="p">:</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">      </span><span class="nt">ir_drop</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">r_wire</span><span class="p">:</span><span class="w"> </span><span class="nv">1.0</span><span class="p p-Indicator">}</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">      </span><span class="nt">noise</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">sigma</span><span class="p">:</span><span class="w"> </span><span class="nv">0.03</span><span class="p p-Indicator">}</span>
+</code></pre></div>
+<hr />
+<h2 id="phase-2-model-converters-analoglibneural">Phase 2: Model Converters (<code>analoglib.neural</code>)</h2>
+<h3 id="goal_1">Goal</h3>
+<p>Convert trained framework model graphs to AIR, then lower to Crossbar. Converters produce AIR — not Crossbars directly. This keeps the converter logic completely decoupled from hardware implementation.</p>
+<h3 id="implementation-order-within-phase-2">Implementation order within Phase 2</h3>
+<ol>
+<li><code>nn.Linear</code> → <code>CrossbarLayer</code> AIR node</li>
+<li>Sequential MLP (stack of Linear + Activations)</li>
+<li>Activations (ReLU, Sigmoid, Softmax) as <code>ActivationLayer</code> nodes</li>
+<li><code>nn.Conv2d</code> lowered via <strong>im2col → GEMM → CrossbarLayer</strong> (not a direct crossbar model)</li>
+</ol>
+<h3 id="task-21-pytorch-converter-analoglibneuraltorch_converter">Task 2.1: PyTorch Converter (<code>analoglib.neural.torch_converter</code>)</h3>
+<ul>
+<li>[ ] Graph walk over <code>nn.Module</code> children</li>
+<li>[ ] <code>nn.Linear</code> → <code>AIRLayer(type="crossbar", matrix=[in, out], weights=W)</code></li>
+<li>[ ] <code>nn.ReLU / Sigmoid / Softmax</code> → <code>AIRLayer(type="activation", fn=...)</code></li>
+<li>[ ] <code>nn.Conv2d</code> → im2col lowering → <code>AIRLayer(type="crossbar")</code></li>
+<li>[ ] Unit tests: MNIST MLP forward pass error &lt; 1e-5 in dev mode</li>
+</ul>
+<h3 id="task-22-tensorflow-converter-analoglibneuraltf_converter">Task 2.2: TensorFlow Converter (<code>analoglib.neural.tf_converter</code>)</h3>
+<ul>
+<li>[ ] Keras <code>Dense</code> → <code>CrossbarLayer</code></li>
+<li>[ ] Keras <code>Conv2D</code> → im2col → <code>CrossbarLayer</code></li>
+<li>[ ] Functional + Sequential API support</li>
+</ul>
+<h3 id="task-23-onnx-importer-analoglibneuralonnx_importer">Task 2.3: ONNX Importer (<code>analoglib.neural.onnx_importer</code>)</h3>
+<ul>
+<li>[ ] Parse <code>Gemm</code> / <code>MatMul</code> / <code>Conv</code> nodes in ONNX graph</li>
+<li>[ ] Emit <code>AIRLayer</code> nodes from ONNX nodes</li>
+<li>[ ] Tests: export from both PyTorch and TF, validate AIR equivalence</li>
+</ul>
+<hr />
+<h2 id="phase-3-tiledcrossbar-analoglibcrossbartiled">Phase 3: TiledCrossbar (<code>analoglib.crossbar.tiled</code>)</h2>
+<h3 id="goal_2">Goal</h3>
+<p>Handle weight matrices larger than a single crossbar tile. Expose <strong>identical VMM interface</strong> to <code>Crossbar</code> so the simulator doesn't care.</p>
+<h3 id="primary-invariant-test-must-pass-before-shipping">Primary Invariant Test (must pass before shipping)</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># pseudocode - post-MVP roadmap verification</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">ref</span> <span class="o">=</span> <span class="n">Crossbar</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span><span class="o">.</span><span class="n">vmm</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">tiled</span> <span class="o">=</span> <span class="n">TiledCrossbar</span><span class="o">.</span><span class="n">from_matrix</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">tile_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">ReRAM</span><span class="p">(</span><span class="o">...</span><span class="p">))</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">tiled</span><span class="o">.</span><span class="n">vmm</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>  <span class="c1"># ideal mode</span>
+</code></pre></div>
+<h3 id="task-31-tiledcrossbar">Task 3.1: <code>TiledCrossbar</code></h3>
+<ul>
+<li>[ ] Split weight matrix into <code>(ceil(rows/tile_r), ceil(cols/tile_c))</code> tile grid</li>
+<li>[ ] Pad final tiles to tile dimensions with 0s</li>
+<li>[ ] VMM: partial current accumulation across row-tiles, concatenation across col-tiles</li>
+<li>[ ] Expose <code>get_conductance()</code> and <code>reconstruct_weights()</code> across all tiles</li>
+</ul>
+<h3 id="task-32-air-integration">Task 3.2: AIR integration</h3>
+<ul>
+<li>[ ] <code>AIRLayer(tiles=[128,128])</code> lowers to <code>TiledCrossbar</code> not <code>Crossbar</code></li>
+<li>[ ] <code>TiledCrossbar</code> saves/loads natively in <code>.analog</code> format</li>
+</ul>
+<hr />
+<h2 id="phase-4-hardware-effects-analoglibeffects">Phase 4: Hardware Effects (<code>analoglib.effects</code>)</h2>
+<h3 id="goal_3">Goal</h3>
+<p>Rename and reorganize physical effects into a separate pluggable pipeline. IR drop is <strong>not</strong> a device property — it is a system/interconnect effect.</p>
+<h3 id="new-module-layout">New module layout</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>analoglib/
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    effects/
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>        __init__.py
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>        base.py       ← Effect ABC
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>        ir_drop.py
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>        thermal.py
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>        drift.py
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>        variation.py
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>        noise.py      ← (migrated from devices/noise.py)
+</code></pre></div>
+<h3 id="effect-abc">Effect ABC</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># pseudocode - Effect ABC definition</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">Effect</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">EffectContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>        <span class="o">...</span>
+</code></pre></div>
+<h3 id="crossbar-api-change-additive-non-breaking">Crossbar API change (additive, non-breaking)</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># pseudocode - Crossbar API proposal</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1"># New optional parameter</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">Crossbar</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">reram</span><span class="p">,</span> <span class="n">effects</span><span class="o">=</span><span class="p">[</span><span class="n">IRDrop</span><span class="p">(</span><span class="n">r_wire</span><span class="o">=</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">Thermal</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">350</span><span class="p">)])</span>
+</code></pre></div>
+<h3 id="task-41-effect-abc-registry">Task 4.1: Effect ABC + registry</h3>
+<ul>
+<li>[ ] Define <code>Effect</code> base class and <code>EffectContext</code> (crossbar geometry, voltages, temperature)</li>
+<li>[ ] Implement registry via <code>__init_subclass__</code> (same pattern as <code>Device</code>)</li>
+</ul>
+<h3 id="task-42-ir-drop-most-valuable-implement-first">Task 4.2: IR Drop (most valuable, implement first)</h3>
+<ul>
+<li>[ ] Parasitic wire resistance model (r_wire per cell segment)</li>
+<li>[ ] Node voltage solver via MNA matrix for a tile</li>
+<li>[ ] Benchmark: 64×64 in &lt; 50ms, 128×128 in &lt; 500ms</li>
+</ul>
+<h3 id="task-43-thermal">Task 4.3: Thermal</h3>
+<ul>
+<li>[ ] Temperature-dependent G: <code>G(T) = G_0 * exp(-E_a / (k*T))</code></li>
+<li>[ ] <code>Thermal(T_kelvin=300, E_a=...)</code> Effect</li>
+</ul>
+<h3 id="task-44-temporal-drift">Task 4.4: Temporal Drift</h3>
+<ul>
+<li>[ ] <code>G(t) = G_0 * (t / t_0)^(-nu)</code> power-law retention drift</li>
+<li>[ ] <code>Drift(t_seconds=..., nu=...)</code> Effect</li>
+</ul>
+<blockquote>
+<p><strong>Note</strong>: <code>SimulationMode.HARDWARE</code> will automatically apply all <code>effects</code> registered on a <code>Crossbar</code> during VMM. No new enum value needed.</p>
+</blockquote>
+<hr />
+<h2 id="phase-5-analytics-analoglibanalysis">Phase 5: Analytics (<code>analoglib.analysis</code>)</h2>
+<blockquote>
+<p><strong>Important correction</strong>: All power formulas must consume <strong>actual cell voltages from the hardware solver</strong> (not assume ideal input voltage), especially after IR drop is enabled.</p>
+</blockquote>
+<h3 id="core-metrics-to-track-internally">Core metrics to track internally</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Symbol</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Operations per VMM</td>
+<td>ops</td>
+<td>2MN</td>
+</tr>
+<tr>
+<td>Crossbar read energy</td>
+<td>E_read</td>
+<td>J</td>
+</tr>
+<tr>
+<td>ADC conversion energy</td>
+<td>E_adc</td>
+<td>J</td>
+</tr>
+<tr>
+<td>DAC conversion energy</td>
+<td>E_dac</td>
+<td>J</td>
+</tr>
+<tr>
+<td>Total energy per pass</td>
+<td>E_total</td>
+<td>J</td>
+</tr>
+<tr>
+<td>Latency per VMM</td>
+<td>t_vmm</td>
+<td>s</td>
+</tr>
+<tr>
+<td>Static array power</td>
+<td>P_static</td>
+<td>W</td>
+</tr>
+<tr>
+<td>Dynamic total power</td>
+<td>P_total</td>
+<td>W</td>
+</tr>
+<tr>
+<td>Throughput</td>
+<td>T</td>
+<td>ops/s</td>
+</tr>
+<tr>
+<td>Energy efficiency</td>
+<td>η</td>
+<td>TOPS/W</td>
+</tr>
+</tbody>
+</table>
+<h3 id="correct-power-formula-ir-drop-aware">Correct power formula (IR drop-aware)</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>P = Σ_{i,j} V_ij² × G_ij          (uses actual cell voltage, not input voltage)
+</code></pre></div>
+<h3 id="task-51-analogprofiler">Task 5.1: <code>AnalogProfiler</code></h3>
+<ul>
+<li>[ ] <code>.profile(simulation_result)</code> → <code>AnalogReport</code></li>
+<li>[ ] All metrics derived from simulation pass results (not re-computed from scratch)</li>
+<li>[ ] <code>AnalogReport.summary()</code> prints structured table</li>
+</ul>
+<h3 id="task-52-area-estimator">Task 5.2: Area estimator</h3>
+<ul>
+<li>[ ] Cell area from <code>F²</code> technology node parameter</li>
+<li>[ ] ADC/DAC peripheral area lookup table by precision</li>
+</ul>
+<hr />
+<h2 id="phase-6-exporters-analoglibexporters">Phase 6: Exporters (<code>analoglib.exporters</code>)</h2>
+<h3 id="goal-air-circuit-representation">Goal: AIR → circuit representation</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>AnalogModel
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    ↓
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>   AIR
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    ↓
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>SPICE netlist ─→ ngspice / LTspice
+</code></pre></div>
+<p>This provides a <strong>validation story</strong>: compare AnalogLib simulation against SPICE simulation.</p>
+<h3 id="spice-dialect-support-order-implement-and-validate-individually">SPICE dialect support order (implement and validate individually)</h3>
+<ol>
+<li>ngspice (first, open source, easiest to automate)</li>
+<li>LTspice</li>
+<li>Spectre (do not claim compatibility without test)</li>
+<li>HSPICE (do not claim compatibility without test)</li>
+</ol>
+<h3 id="task-61-spiceexporter">Task 6.1: <code>SpiceExporter</code></h3>
+<ul>
+<li>[ ] Cell subcircuit: <code>R_cell = 1/G</code>, plus optional C_line per cell</li>
+<li>[ ] Wire parasitics: <code>R_wire</code> per metal segment</li>
+<li>[ ] Voltage source drivers on row lines</li>
+<li>[ ] Sense amplifier load resistor on column lines</li>
+<li>[ ] <code>.export(path, dialect="ngspice")</code> writes <code>.cir</code> file</li>
+</ul>
+<h3 id="task-62-verilog-a">Task 6.2: Verilog-A</h3>
+<ul>
+<li>[ ] Behavioral ReRAM cell module</li>
+<li>[ ] Top-level crossbar module with embedded conductance parameters</li>
+</ul>
+<hr />
+<h2 id="phase-7-visualization-analoglibvisualization">Phase 7: Visualization (<code>analoglib.visualization</code>)</h2>
+<blockquote>
+<p>Build the underlying plot functions first. Hold the interactive dashboard until the rest of the API stabilizes.</p>
+</blockquote>
+<h3 id="task-71-core-plot-api-analoglibvisualizationplots">Task 7.1: Core plot API (<code>analoglib.visualization.plots</code>)</h3>
+<ul>
+<li>[ ] <code>plot_conductance_matrix(crossbar)</code> — heatmap of G+ and G−</li>
+<li>[ ] <code>plot_weight_error_histogram(W_orig, W_recon)</code> — quantization error distribution</li>
+<li>[ ] <code>plot_noise_sweep(sigmas, snr_list)</code> — read noise vs SNR</li>
+<li>[ ] <code>plot_adc_sweep(bits_list, sqnr_list)</code> — ADC precision vs SQNR</li>
+</ul>
+<h3 id="task-72-interactive-dashboard-after-api-freeze">Task 7.2: Interactive dashboard (after API freeze)</h3>
+<ul>
+<li>[ ] Streamlit / Dash interface for live parameter sweeps</li>
+</ul>
+<hr />
+<h2 id="phase-8-cli-analoglibcli">Phase 8: CLI (<code>analoglib.cli</code>)</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>analog<span class="w"> </span>compile<span class="w"> </span>model.onnx<span class="w"> </span>--device<span class="w"> </span>reram<span class="w"> </span>--tile<span class="w"> </span>128x128<span class="w"> </span>--out<span class="w"> </span>model.analog
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>analog<span class="w"> </span>simulate<span class="w"> </span>model.analog<span class="w"> </span>--mode<span class="w"> </span>hardware<span class="w"> </span>--adc<span class="w"> </span><span class="m">8</span><span class="w"> </span>--dac<span class="w"> </span><span class="m">8</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>analog<span class="w"> </span>analyze<span class="w"> </span>model.analog
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>analog<span class="w"> </span>export-spice<span class="w"> </span>model.analog<span class="w"> </span>--dialect<span class="w"> </span>ngspice<span class="w"> </span>--out<span class="w"> </span>circuit.cir
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>analog<span class="w"> </span>info<span class="w"> </span>model.analog
+</code></pre></div>
+<h3 id="task-81-cli-entry-point">Task 8.1: CLI entry point</h3>
+<ul>
+<li>[ ] <code>click</code>-based CLI registered as <code>analoglib.cli:main</code> in <code>pyproject.toml</code></li>
+<li>[ ] <code>analog compile</code> → calls <code>neural.{torch|onnx|tf}_converter</code> → <code>AIR</code> → <code>.analog</code></li>
+<li>[ ] <code>analog simulate</code> → loads <code>.analog</code> → <code>SimulationEngine.run()</code></li>
+<li>[ ] <code>analog analyze</code> → loads <code>.analog</code> + simulation log → <code>AnalogProfiler.profile()</code></li>
+<li>[ ] <code>analog export-spice</code> → loads <code>.analog</code> → <code>SpiceExporter.export()</code></li>
+<li>[ ] <code>analog info</code> → decrypts metadata and prints layer summary</li>
+</ul>
+<hr />
+<h2 id="target-vision-end-to-end-researcher-workflow">Target Vision: End-to-End Researcher Workflow</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># pseudocode - post-MVP target vision</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">analoglib</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">al</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">model</span> <span class="o">=</span> <span class="n">al</span><span class="o">.</span><span class="n">import_model</span><span class="p">(</span><span class="s2">&quot;mnist.onnx&quot;</span><span class="p">)</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    <span class="n">device</span><span class="o">=</span><span class="n">al</span><span class="o">.</span><span class="n">ReRAM</span><span class="p">(</span><span class="n">g_min</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">g_max</span><span class="o">=</span><span class="mf">100e-6</span><span class="p">,</span> <span class="n">num_states</span><span class="o">=</span><span class="mi">256</span><span class="p">),</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>    <span class="n">tile</span><span class="o">=</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">),</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>    <span class="n">mapping</span><span class="o">=</span><span class="s2">&quot;differential&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="p">)</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;hardware&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>    <span class="n">effects</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ir_drop&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;noise&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;drift&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>    <span class="n">adc_bits</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>    <span class="n">dac_bits</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="p">)</span>
+<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>
+<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="n">result</span><span class="o">.</span><span class="n">report</span><span class="p">()</span>
+<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a><span class="c1"># → structured report: accuracy, energy, latency, TOPS/W</span>
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
