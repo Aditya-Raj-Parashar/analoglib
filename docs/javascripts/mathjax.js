@@ -11,12 +11,15 @@ window.MathJax = {
   }
 };
 
-if (typeof document !== "undefined" && document.subscribe) {
-  document.subscribe(function() {
-    if (window.MathJax && window.MathJax.typesetPromise) {
-      MathJax.startup.output.clearCache();
-      MathJax.typesetClear();
-      MathJax.texReset();
+document.addEventListener("DOMContentLoaded", function() {
+  if (typeof MathJax !== "undefined" && MathJax.typesetPromise) {
+    MathJax.typesetPromise();
+  }
+});
+
+if (typeof location$ !== "undefined") {
+  location$.subscribe(function() {
+    if (typeof MathJax !== "undefined" && MathJax.typesetPromise) {
       MathJax.typesetPromise();
     }
   });

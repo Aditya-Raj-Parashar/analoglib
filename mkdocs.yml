@@ -41,6 +41,8 @@ markdown_extensions:
       alternate_style: true
   - pymdownx.arithmatex:
       generic: true
+      smart_dollar: false
+
   - pymdownx.details
   - tables
   - attr_list
