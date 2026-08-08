@@ -1,374 +1,173 @@
-# AnalogLib — API Reference
+# AnalogLib API Reference
 
-Complete reference for every public class, function, and parameter in `analoglib v0.1.0`.
+Complete reference for every package, module, class, function, parameter, return type, and exception in `analoglib`.
 
 ---
 
 ## Table of Contents
-
-- [Top-Level Functions](#top-level-functions)
-- [Devices](#devices)
-  - [Device (base)](#device-base-class)
-  - [IdealDevice](#idealdevice)
-  - [ReRAM](#reram)
-- [Mapping Strategies](#mapping-strategies)
-  - [MappingStrategy (base)](#mappingstrategy-base-class)
-  - [DifferentialMapping](#differentialmapping)
-  - [OffsetMapping](#offsetmapping)
-- [Crossbar](#crossbar)
-- [ADC / DAC](#adc--dac)
-- [SimulationEngine](#simulationengine)
-- [Serialization](#serialization)
-- [Configuration](#configuration)
-- [Enumerations](#enumerations)
+1. [`analoglib` Top-Level Package](#1-analoglib-top-level-package)
+2. [`analoglib.air` — Analog Intermediate Representation](#2-analoglibair-analog-intermediate-representation)
+3. [`analoglib.crossbar` — Crossbars & Tiling](#3-analoglibcrossbar-crossbars--tiling)
+4. [`analoglib.devices` — ReRAM & Memristive Devices](#4-analoglibdevices-reram--memristive-devices)
+5. [`analoglib.effects` — Physical Non-Idealities](#5-analoglibeffects-physical-non-idealities)
+6. [`analoglib.mapping` — Weight Conductance Mapping](#6-analoglibmapping-weight-conductance-mapping)
+7. [`analoglib.adc_dac` — Quantized Peripheral Converters](#7-analoglibadc_dac-quantized-peripheral-converters)
+8. [`analoglib.simulation` — Execution Engine](#8-analoglibsimulation-execution-engine)
+9. [`analoglib.analysis` — Hardware Profiler & Analytics](#9-analoglibanalysis-hardware-profiler--analytics)
+10. [`analoglib.exporters` — SPICE Circuit Exporter](#10-analoglibexporters-spice-circuit-exporter)
+11. [`analoglib.neural` — Model Converters](#11-analoglibneural-model-converters)
+12. [`analoglib.visualization` — Plotting Utilities](#12-analoglibvisualization-plotting-utilities)
+13. [`analoglib.cli` — Command Line Interface](#13-analoglibcli-command-line-interface)
 
 ---
 
-## Top-Level Functions
-
-These are available directly as `al.<function>` after `import analoglib as al`.
-
-### `al.save(path, crossbars, *, model_name="", description="", extra_meta=None) → Path`
-
-Save crossbar model(s) to an encrypted `.analog` file.
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `path` | `str \| Path` | Output file path. `.analog` extension added automatically if missing. |
-| `crossbars` | `list[Crossbar]` | One or more crossbar layers with loaded weights. |
-| `model_name` | `str` | Optional model name stored in metadata. |
-| `description` | `str` | Optional description. |
-| `extra_meta` | `dict` | Arbitrary user metadata (must be JSON-serializable). |
-
-**Returns**: Absolute `Path` to the saved file.
-
-### `al.load(path) → dict`
-
-Load an encrypted `.analog` file.
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `path` | `str \| Path` | Path to `.analog` file. |
-
-**Returns**: Dictionary with keys:
-- `"meta"` — metadata dict (model_name, description, timestamps, etc.)
-- `"config"` — list of crossbar configuration dicts
-- `"crossbars"` — list of reconstructed `Crossbar` objects with conductances restored
-
-**Raises**: `ValueError` if file is not a valid `.analog` file.
-
-### `al.set_seed(seed: int) → None`
-
-Set the global random seed for reproducibility. Affects all noise and variation operations.
-
-### `al.get_rng() → numpy.random.Generator`
-
-Get a NumPy random generator honoring the global seed.
-
-### `al.to_numpy(x) → numpy.ndarray`
-
-Convert any array-like input to NumPy. Accepts: `numpy.ndarray`, `list`, `tuple`, `torch.Tensor`, `tf.Tensor`.
-
----
-
-## Devices
-
-### Device (base class)
-
-`analoglib.devices.Device` — Abstract base for all analog memory devices.
+## 1. `analoglib` Top-Level Package
 
 ```python
-class Device(ABC):
-    g_min: float          # Minimum conductance (Siemens)
-    g_max: float          # Maximum conductance (Siemens)
-    num_states: int       # Discrete programmable levels (0 = continuous)
+import analoglib as al
 ```
 
-#### Properties
-
-| Property | Returns | Description |
-|----------|---------|-------------|
-| `g_range` | `float` | `g_max - g_min` |
-
-#### Methods
-
-| Method | Signature | Description |
-|--------|-----------|-------------|
-| `quantize` | `(g: ndarray) → ndarray` | Snap conductances to nearest valid device state |
-| `add_noise` | `(g: ndarray) → ndarray` | Inject read noise |
-| `add_variation` | `(g: ndarray) → ndarray` | Apply device-to-device variation |
-| `conductance_levels` | `() → ndarray` | Array of all valid conductance values |
-| `to_dict` | `() → dict` | Serialize device configuration |
-| `from_dict` | `(d: dict) → Device` | Reconstruct device from dict (class method) |
-
-#### Registry
-
-| Method | Description |
-|--------|-------------|
-| `Device.registry()` | Returns `dict` of all registered device subclasses |
-| `Device.get(name)` | Look up device class by name string |
+### Global Functions
+- `al.save(filepath: str, crossbars: List[Crossbar], meta: Dict[str, Any] = None) -> None`: Serializes crossbar models to encrypted `.analog` binary format (AES-256-GCM + MsgPack).
+- `al.load(filepath: str) -> Dict[str, Any]`: Loads and decrypts `.analog` file, returning dictionary with keys `"crossbars"` and `"meta"`.
+- `al.set_seed(seed: int) -> None`: Sets global random seed for reproducibility across device noise models and variation.
 
 ---
 
-### IdealDevice
+## 2. `analoglib.air` (Analog Intermediate Representation)
 
-`analoglib.devices.IdealDevice` — Perfect device, no non-idealities.
+### `AIRGraph`
+- `AIRGraph(name: str = "model", description: str = "")`: Graph schema representing an analog neural network.
+- `.add_layer(layer: AIRLayer) -> AIRGraph`: Append layer.
+- `.get_layer(name: str) -> AIRLayer`: Lookup layer by name.
+- `.validate() -> None`: Verify graph structural invariants.
+- `.to_dict() -> Dict[str, Any]`: Export graph as dictionary.
+- `.from_dict(d: Dict[str, Any]) -> AIRGraph`: Load graph from dictionary.
 
-```python
-IdealDevice(g_min=0.0, g_max=1.0)
-```
+### `AIRLayer`
+- `AIRLayer(layer_type: LayerType, name: str, matrix_shape: Tuple[int, int] = None, weights: np.ndarray = None, activation_fn: ActivationFn = None, peripherals: PeripheralConfig = None, effects: List[EffectConfig] = None)`: Node in AIRGraph.
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `g_min` | `0.0` | Minimum conductance |
-| `g_max` | `1.0` | Maximum conductance |
+### `lower` Compiler Pass
+- `al.lower(air_graph: AIRGraph, device: Device = None, adc_bits: int = None, dac_bits: int = None, quantize: bool = True) -> SimulationEngine`: Compiles AIRGraph into an executable `SimulationEngine`.
 
-Behavior: `quantize()` only clamps to bounds. `add_noise()` and `add_variation()` are identity operations.
-
----
-
-### ReRAM
-
-`analoglib.devices.ReRAM` — Resistive RAM with configurable non-idealities.
-
-```python
-ReRAM(
-    g_min=1e-6,
-    g_max=100e-6,
-    num_states=256,
-    read_noise_sigma=0.0,
-    programming_error_sigma=0.0,
-    d2d_variation_sigma=0.0,
-    stuck_at_fault_rate=0.0,
-)
-```
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `g_min` | `1e-6` | Minimum conductance (S) |
-| `g_max` | `100e-6` | Maximum conductance (S) |
-| `num_states` | `256` | Discrete levels (256 = 8-bit) |
-| `read_noise_sigma` | `0.0` | Gaussian read noise σ (relative to window) |
-| `programming_error_sigma` | `0.0` | Write error σ (applied after quantization) |
-| `d2d_variation_sigma` | `0.0` | Device-to-device variation σ |
-| `stuck_at_fault_rate` | `0.0` | Fraction of stuck devices (0.0 to 1.0) |
-
-**All sigma values** are relative — e.g., `read_noise_sigma=0.03` means σ = 3% of `(g_max - g_min)`.
+### `AnalogModel`
+- `AnalogModel(air_graph: AIRGraph)`: High-level model wrapper.
+- `AnalogModel.from_numpy(weights: List[np.ndarray], activations: List[str] = None) -> AnalogModel`: Factory from NumPy weight matrices.
+- `AnalogModel.from_torch(module: nn.Module) -> AnalogModel`: Factory from PyTorch model.
+- `.compile(...) -> AnalogModel`: Target specific physical devices and peripherals.
+- `.simulate(x: np.ndarray, mode: str = "ideal") -> SimulationResult`: Run inference.
 
 ---
 
-## Mapping Strategies
+## 3. `analoglib.crossbar` (Crossbars & Tiling)
 
-### MappingStrategy (base class)
+### `Crossbar`
+- `Crossbar(rows: int, cols: int, device: Device = None, mapping: MappingStrategy = None, differential: bool = True, effects: List[Effect] = None)`: Single crossbar array engine.
+- `.load_weights(W: np.ndarray, quantize: bool = True) -> None`: Map weights to physical conductances $G^+$ and $G^-$.
+- `.vmm(V: np.ndarray, noise: bool = False, mode: SimulationMode = "ideal") -> np.ndarray`: Execute vector-matrix multiplication $I = V \cdot (G^+ - G^-)$.
+- `.reconstruct_weights() -> np.ndarray`: Extract effective stored weights.
+- `.get_conductance() -> Tuple[np.ndarray, np.ndarray]`: Return raw $G^+$ and $G^-$ matrices.
 
-`analoglib.mapping.MappingStrategy` — Abstract base for weight ↔ conductance mapping.
-
-| Method | Signature | Description |
-|--------|-----------|-------------|
-| `weights_to_conductance` | `(W, device) → tuple[ndarray, ...]` | Forward mapping |
-| `conductance_to_weights` | `(*G, device=) → ndarray` | Inverse mapping |
-
----
-
-### DifferentialMapping
-
-`analoglib.mapping.DifferentialMapping` — Maps weights to (G⁺, G⁻) pairs.
-
-```python
-DifferentialMapping(w_max=None)
-```
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `w_max` | `None` | Max absolute weight for normalization. `None` = auto-detect from data. |
-
-**Forward**: `weights_to_conductance(W, device) → (G_pos, G_neg)`
-
-**Inverse**: `conductance_to_weights(G_pos, G_neg, device=) → W`
+### `TiledCrossbar`
+- `TiledCrossbar(rows: int, cols: int, tile_rows: int, tile_cols: int, device: Device = None, mapping: MappingStrategy = None)`: Grid of physical crossbars for large matrices.
+- `TiledCrossbar.from_matrix(W: np.ndarray, tile_shape: Tuple[int, int], ...)`: Factory method.
+- `.vmm(V: np.ndarray, noise: bool = False, mode: SimulationMode = "ideal") -> np.ndarray`: Computes tiled VMM with automatic global $w_{\text{max}}$ scaling across tiles.
 
 ---
 
-### OffsetMapping
+## 4. `analoglib.devices` (ReRAM & Memristive Devices)
 
-`analoglib.mapping.OffsetMapping` — Single-device mapping with conductance offset.
+### `Device` (Abstract Base Class)
+- Abstract methods: `.g_range`, `.quantize(g)`, `.add_noise(g)`, `.to_dict()`, `from_dict(d)`.
 
-```python
-OffsetMapping(w_max=None)
-```
+### `ReRAM`
+- `ReRAM(g_min: float = 1e-6, g_max: float = 100e-6, num_states: int = 256, read_noise_sigma: float = 0.0, device_variation_sigma: float = 0.0)`: Realistic ReRAM device model.
 
-**Forward**: `weights_to_conductance(W, device) → (G,)` (single matrix)
-
-**Inverse**: `conductance_to_weights(G, device=) → W`
-
----
-
-## Crossbar
-
-`analoglib.crossbar.Crossbar` — Resistive crossbar array for analog VMM.
-
-```python
-Crossbar(
-    rows,
-    cols,
-    device=None,
-    mapping=None,
-    differential=True,
-)
-```
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `rows` | — | Number of row lines (input dimension) |
-| `cols` | — | Number of column lines (output dimension) |
-| `device` | `IdealDevice()` | Analog memory device model |
-| `mapping` | `DifferentialMapping()` | Weight-to-conductance mapping strategy |
-| `differential` | `True` | Use G⁺/G⁻ differential representation |
-
-### Methods
-
-#### `load_weights(W, quantize=True, apply_variation=False)`
-
-Convert and store weight matrix `W` (shape `(rows, cols)`) as conductances.
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `W` | — | Weight matrix (numpy, torch, tf, or list) |
-| `quantize` | `True` | Quantize conductances to device levels |
-| `apply_variation` | `False` | Apply D2D variation after programming |
-
-#### `vmm(V, noise=False, mode=SimulationMode.IDEAL) → ndarray`
-
-Vector-matrix multiply. Accepts 1-D `(rows,)` or batch `(batch, rows)`.
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `V` | — | Input voltage vector |
-| `noise` | `False` | Inject read noise during computation |
-| `mode` | `IDEAL` | Simulation fidelity level |
-
-**Returns**: Output current `(cols,)` or `(batch, cols)`.
-
-#### `get_conductance() → tuple[ndarray, ...]`
-
-Returns `(G_pos, G_neg)` for differential or `(G,)` for single-device.
-
-#### `reconstruct_weights() → ndarray`
-
-Inverse-map conductances back to weights (includes quantization error).
+### `IdealDevice`
+- `IdealDevice()`: Unquantized, noise-free baseline device ($G \in [0, 1]$ Siemens).
 
 ---
 
-## ADC / DAC
+## 5. `analoglib.effects` (Physical Non-Idealities)
 
-### ADC
+### `IRDrop`
+- `IRDrop(r_wire: float = 1.0)`: Parasitic wire resistance IR drop effect along wordlines and bitlines.
 
-`analoglib.adc_dac.ADC` — Analog-to-digital converter.
+### `Thermal`
+- `Thermal(E_a: float = 0.1, T_ref: float = 300.0)`: Arrhenius temperature-dependent conductance scaling $G(T)$.
 
-```python
-ADC(bits=8, v_min=0.0, v_max=1.0)
-```
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `bits` | `8` | Resolution (n bits → 2ⁿ levels) |
-| `v_min` | `0.0` | Minimum representable value |
-| `v_max` | `1.0` | Maximum representable value |
-
-#### `convert(x: ndarray) → ndarray`
-
-Quantize continuous values. Clips to `[v_min, v_max]`, snaps to nearest level.
-
-#### Properties
-
-- `resolution` → voltage step per LSB
-- `num_levels` → `2^bits`
-
-### DAC
-
-`analoglib.adc_dac.DAC` — Digital-to-analog converter. Same interface as ADC.
-
-```python
-DAC(bits=8, v_min=0.0, v_max=1.0)
-```
+### `Drift`
+- `Drift(nu: float = 0.05, t_0: float = 1.0)`: Power-law retention loss $G(t) = G_0 (t/t_0)^{-\nu}$.
 
 ---
 
-## SimulationEngine
+## 6. `analoglib.mapping` (Weight-to-Conductance Mapping)
 
-`analoglib.simulation.SimulationEngine` — Orchestrates multi-layer analog inference.
+### `DifferentialMapping`
+- `DifferentialMapping(w_max: float = None)`: Maps signed weights to differential pairs $(G^+, G^-)$.
 
-```python
-SimulationEngine(crossbars=None, adc=None, dac=None)
-```
-
-### Methods
-
-#### `run(x, mode="ideal") → ndarray`
-
-Forward pass through all crossbars.
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `x` | — | Input vector/batch |
-| `mode` | `"ideal"` | `"ideal"`, `"device"`, or `"hardware"` |
-
-#### `run_comparison(x, modes=None) → dict[str, ndarray]`
-
-Run in multiple modes, returns `{"ideal": ..., "device": ..., "hardware": ...}`.
-
-#### `add_crossbar(xbar)`
-
-Append a crossbar to the layer stack.
+### `OffsetMapping`
+- `OffsetMapping(w_max: float = None)`: Maps signed weights to single conductance with reference zero-offset.
 
 ---
 
-## Serialization
+## 7. `analoglib.adc_dac` (Peripheral Converters)
 
-### `al.save(path, crossbars, **kwargs) → Path`
+### `ADC`
+- `ADC(bits: int = 8, v_min: float = -500e-6, v_max: float = 500e-6)`: Uniform linear ADC quantization.
 
-See [Top-Level Functions](#top-level-functions).
-
-### `al.load(path) → dict`
-
-See [Top-Level Functions](#top-level-functions).
-
-### File format
-
-Files use magic bytes `0xAE4C4942`, AES-256-GCM encryption, zlib compression. Not readable without AnalogLib.
+### `DAC`
+- `DAC(bits: int = 8, v_min: float = 0.0, v_max: float = 1.0)`: Uniform linear DAC quantization.
 
 ---
 
-## Configuration
+## 8. `analoglib.simulation` (Execution Engine)
 
-### `al.CFG`
-
-Global `AnalogConfig` instance:
-
-| Field | Default | Description |
-|-------|---------|-------------|
-| `seed` | `None` | Random seed (None = non-deterministic) |
-| `default_dtype` | `np.float64` | Default array dtype |
-| `float_tolerance` | `1e-12` | Numerical comparison tolerance |
+### `SimulationEngine`
+- `SimulationEngine(crossbars: List[Crossbar], adc: ADC = None, dac: DAC = None)`: Multi-layer crossbar simulation pipeline.
+- `.run(V: np.ndarray, mode: str = "ideal") -> np.ndarray`: Run multi-layer inference in `"ideal"`, `"device"`, or `"hardware"` mode.
 
 ---
 
-## Enumerations
+## 9. `analoglib.analysis` (Profiler & Analytics)
 
-### `al.SimulationMode`
+### `AnalogProfiler`
+- `AnalogProfiler(t_read: float = 10e-9, cell_feature_F: float = 10.0, V_supply: float = 1.0)`: Analyzes physical metrics.
+- `.profile(crossbars: List[Crossbar], V_input: np.ndarray, adc: ADC = None, dac: DAC = None) -> AnalogReport`: Computes array power, read energy, ADC/DAC energy, area, latency, and TOPS/W.
 
-```python
-SimulationMode.IDEAL     # Mathematical only
-SimulationMode.DEVICE    # + quantization, noise, variation
-SimulationMode.HARDWARE  # + ADC/DAC
-SimulationMode.SPICE     # Circuit-level (future)
-```
+### `AnalogReport`
+- Data class containing performance metrics and `.summary()` / `.print()` reporting methods.
 
-### `al.NoiseType`
+---
 
-```python
-NoiseType.NONE
-NoiseType.GAUSSIAN
-NoiseType.UNIFORM
-NoiseType.THERMAL
-NoiseType.SHOT
-```
+## 10. `analoglib.exporters` (SPICE Netlist Exporter)
+
+### `SpiceExporter`
+- `SpiceExporter(dialect: str = "ngspice", R_load: float = 1e3, V_dd: float = 1.0)`: Converts crossbar models to SPICE netlists.
+- `.export(path: str, crossbars: List[Crossbar], V_inputs: np.ndarray = None) -> Path`: Writes `.cir` file.
+- `.export_str(crossbars: List[Crossbar]) -> str`: Returns netlist string.
+
+---
+
+## 11. `analoglib.neural` (Model Converters)
+
+- `from_numpy(weights: List[np.ndarray], activations: List[str] = None) -> AIRGraph`
+- `from_torch(module: nn.Module) -> AIRGraph`
+
+---
+
+## 12. `analoglib.visualization` (Plotting Utilities)
+
+- `plot_conductance_matrix(crossbar, save_path: str = None)`
+- `plot_weight_error_histogram(W_orig, W_recon, save_path: str = None)`
+- `plot_noise_sweep(sigmas, snr_db, save_path: str = None)`
+- `plot_adc_precision_sweep(bits_list, sqnr_db, save_path: str = None)`
+
+---
+
+## 13. `analoglib.cli` (Command Line Interface)
+
+- `analog info <file.analog>`
+- `analog simulate <file.analog> [--mode ideal|device|hardware]`
+- `analog profile <file.analog>`
+- `analog export-spice <file.analog> [--out circuit.cir]`

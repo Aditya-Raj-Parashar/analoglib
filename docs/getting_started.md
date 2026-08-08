@@ -1,248 +1,157 @@
-# AnalogLib — Getting Started Guide
+# Getting Started with AnalogLib
 
-Welcome to **AnalogLib**, an open-source Python library for simulating analog computing systems. This guide will take you from zero to running your first analog crossbar simulation.
+Welcome to **AnalogLib**, an open-source Python library for simulating analog in-memory computing (IMC) and neural network inference on resistive crossbar arrays (ReRAM, PCM, Flash).
 
----
-
-## What is Analog Computing?
-
-Traditional (digital) computing represents numbers as binary bits and uses transistor logic gates. **Analog computing** uses continuous physical quantities — like electrical current and conductance — to perform calculations directly in hardware.
-
-### Why does this matter?
-
-Neural networks are essentially giant matrix multiplications. In digital hardware, each multiply-accumulate (MAC) operation costs energy. But in an **analog crossbar array**, you can do an entire matrix-vector multiplication in a single step:
-
-```
-Input Voltages  →  Crossbar Array  →  Output Currents
-    V[i]         ×   G[i,j]         =    I[j]
-```
-
-This is possible because of **Ohm's Law** (`I = G × V`) and **Kirchhoff's Current Law** (currents sum at a node). The crossbar computes `I = G @ V` in one physical step — potentially thousands of times more energy-efficient than digital.
-
-### The catch
-
-Real analog devices aren't perfect:
-- Conductances can only take **discrete values** (quantization)
-- Devices have **noise** (random fluctuations during read)
-- Each device is **slightly different** (device-to-device variation)
-- Some devices get **stuck** (stuck-at faults)
-
-AnalogLib lets you model all of these effects in software.
+This guide covers everything from your first single crossbar simulation to multi-layer neural network lowering, physical hardware non-idealities, profiling, and SPICE netlist export.
 
 ---
 
-## Installation
+## 1. Installation
 
+### Requirements
+- Python 3.10+
+- NumPy, PyCryptodome, MsgPack, PyTest
+
+### Install from Source
 ```bash
-# Basic install
+git clone https://github.com/Aditya-Raj-Parashar/analoglib.git
+cd analoglib
 pip install -e .
-
-# With development tools (pytest)
-pip install -e ".[dev]"
-
-# With visualization support
-pip install -e ".[viz]"
 ```
 
-**Requirements**: Python ≥ 3.10, NumPy ≥ 1.24
+### Optional Dependencies
+- **PyTorch**: For converting PyTorch `nn.Module` models (`pip install torch`)
+- **Matplotlib**: For visualization plots (`pip install matplotlib`)
 
 ---
 
-## Quick Start (5 minutes)
+## 2. Starter Tutorial: 5-Minute Quick Start
 
-### Step 1: Import the library
-
+### Step 1: Create a ReRAM Crossbar
 ```python
 import analoglib as al
 import numpy as np
+
+# Define physical ReRAM device (1 µS to 100 µS, 256 discrete states)
+device = al.ReRAM(g_min=1e-6, g_max=100e-6, num_states=256, read_noise_sigma=0.01)
+
+# Initialize a 128x64 differential crossbar
+xbar = al.Crossbar(rows=128, cols=64, device=device, differential=True)
+
+# Load weight matrix (mapped automatically to G+ and G- conductances)
+W = np.random.uniform(-1.0, 1.0, (128, 64))
+xbar.load_weights(W, quantize=True)
 ```
 
-### Step 2: Create a device
-
-A "device" models a single memory cell. The most common is **ReRAM** (Resistive RAM):
-
+### Step 2: Perform Analog Matrix-Vector Multiplication (VMM)
 ```python
-device = al.ReRAM(
-    g_min=1e-6,       # Minimum conductance: 1 µS
-    g_max=100e-6,     # Maximum conductance: 100 µS
-    num_states=256,    # 256 programmable levels (8-bit)
+# Create input voltage vector
+V_in = np.random.uniform(0.0, 1.0, 128)
+
+# Execute VMM in three different simulation modes:
+# 1. IDEAL: Mathematical V @ W (unquantized, no noise)
+y_ideal = xbar.vmm(V_in, mode=al.SimulationMode.IDEAL)
+
+# 2. DEVICE: Quantized conductances with read noise
+y_device = xbar.vmm(V_in, mode=al.SimulationMode.DEVICE)
+
+# 3. HARDWARE: Complete peripheral circuit pipeline (DAC -> VMM -> ADC)
+engine = al.SimulationEngine(
+    crossbars=[xbar],
+    adc=al.ADC(bits=8, v_min=-500e-6, v_max=500e-6),
+    dac=al.DAC(bits=8, v_min=0.0, v_max=1.0)
 )
+y_hardware = engine.run(V_in, mode="hardware")
 ```
 
-> **Think of it as**: Each cell is a tiny variable resistor that can be set to 256 different resistance values.
+---
 
-### Step 3: Create a crossbar
+## 3. High-Level Workflow: PyTorch to Analog Simulation
 
-A "crossbar" is a grid of devices. Each row is an input, each column is an output:
+Using **AIR (Analog Intermediate Representation)**, you can convert PyTorch models directly to analog simulation engines with zero manual mapping required:
 
 ```python
-crossbar = al.Crossbar(
-    rows=4,          # 4 inputs
-    cols=3,          # 3 outputs
-    device=device,
-    differential=True,  # Use G+/G- pairs for signed weights
+import torch
+import torch.nn as nn
+import analoglib as al
+
+# 1. Define and train your PyTorch model
+torch_model = nn.Sequential(
+    nn.Linear(784, 128),
+    nn.ReLU(),
+    nn.Linear(128, 10),
 )
-```
 
-### Step 4: Load weights
+# 2. Convert PyTorch model to AnalogModel
+model = al.AnalogModel.from_torch(torch_model)
 
-Take any weight matrix (like from a neural network layer) and load it:
+# 3. Compile targeting physical ReRAM crossbars + ADC/DAC + Hardware Effects
+model.compile(
+    device=al.ReRAM(g_min=1e-6, g_max=100e-6, num_states=256, read_noise_sigma=0.01),
+    adc_bits=8,
+    dac_bits=8,
+    r_wire=1.0,    # Parasitic IR drop (wire resistance per cell)
+    E_a=0.1,       # Thermal Arrhenius conductance scaling
+    nu=0.05,       # Temporal retention drift
+)
 
-```python
-# Random weights for demonstration
-weights = np.array([
-    [ 0.5, -0.3,  0.8],
-    [-0.2,  0.7, -0.1],
-    [ 0.9, -0.5,  0.4],
-    [-0.6,  0.1,  0.3],
-])
+# 4. Simulate inference
+x_input = np.random.uniform(0, 1, 784)
+result = model.simulate(x_input, mode="hardware")
 
-crossbar.load_weights(weights)
-```
-
-Behind the scenes, AnalogLib:
-1. Normalizes the weights to [0, 1]
-2. Maps them to conductance pairs (G⁺, G⁻)
-3. Quantizes to the nearest of 256 device levels
-
-### Step 5: Compute!
-
-Apply input voltages and get output currents:
-
-```python
-input_voltage = np.array([0.5, 0.3, 0.8, 0.2])
-output = crossbar.vmm(input_voltage)  # Vector-Matrix Multiply
-
-print(f"Output: {output}")
-# Output shape: (3,)  — one value per column
-```
-
-### Step 6: Save & share
-
-```python
-al.save("my_model.analog", [crossbar], model_name="demo")
-
-# Later, or on another machine:
-loaded = al.load("my_model.analog")
-loaded_crossbar = loaded["crossbars"][0]
-```
-
-The `.analog` file is encrypted and self-contained. Only AnalogLib can open it.
-
----
-
-## Understanding the Pipeline
-
-```
-Neural Network Weights    (what you start with)
-        ↓
-Weight Normalization      (scale to [-1, 1])
-        ↓
-Conductance Mapping       (W → G⁺, G⁻)
-        ↓
-Device Quantization       (snap to 256 levels)
-        ↓
-Crossbar Storage          (conductance matrices)
-        ↓
-Input Voltage Applied     (your input data)
-        ↓
-Ohmic Current: I = G·V   (physics does the work)
-        ↓
-Column Current Summation  (Kirchhoff's Law)
-        ↓
-Differential Readout      (I⁺ - I⁻ = result)
-        ↓
-Output                    (your inference result)
+# 5. Generate Hardware Performance & Accuracy Report
+result.report()
 ```
 
 ---
 
-## Key Concepts
+## 4. Large Matrix Weight Tiling (`TiledCrossbar`)
 
-### Differential Mapping
-
-Since conductance is always positive (G ≥ 0), but weights can be negative, we use **two devices per weight**:
-
-```
-Positive weight (+0.7):  G⁺ = high,  G⁻ = low   →  G⁺ - G⁻ > 0  ✓
-Negative weight (-0.4):  G⁺ = low,   G⁻ = high   →  G⁺ - G⁻ < 0  ✓
-Zero weight     ( 0.0):  G⁺ = mid,   G⁻ = mid    →  G⁺ - G⁻ = 0  ✓
-```
-
-### Simulation Modes
-
-AnalogLib supports 3 levels of realism:
-
-| Mode | What it includes | Use case |
-|------|-----------------|----------|
-| `ideal` | Perfect math only | Debugging, baseline |
-| `device` | + quantization, noise, variation | Research accuracy studies |
-| `hardware` | + ADC/DAC quantization | Full system simulation |
+When your weight matrix exceeds the physical dimensions of a single crossbar array (e.g., a 1024x512 matrix on 128x64 physical tiles), use `TiledCrossbar`:
 
 ```python
-engine = al.SimulationEngine(crossbars=[crossbar])
+from analoglib import TiledCrossbar, ReRAM
 
-# Compare all modes:
-results = engine.run_comparison(input_voltage)
-print(results["ideal"])     # Perfect
-print(results["device"])    # With noise
-print(results["hardware"])  # Full pipeline
-```
+# Partition 1024x512 weight matrix into 128x64 physical crossbar tiles
+tiled_xbar = TiledCrossbar.from_matrix(
+    W_large,
+    tile_shape=(128, 64),
+    device=ReRAM(g_min=1e-6, g_max=100e-6, num_states=256),
+)
 
-### Devices
-
-| Device | Description | When to use |
-|--------|-------------|-------------|
-| `IdealDevice` | Perfect, no noise | Baseline comparisons |
-| `ReRAM` | Realistic with all non-idealities | Research simulations |
-
----
-
-## Common Patterns
-
-### Comparing ideal vs. noisy inference
-
-```python
-# Ideal device (baseline)
-ideal = al.Crossbar(32, 16, device=al.IdealDevice())
-ideal.load_weights(W, quantize=False)
-out_ideal = ideal.vmm(V)
-
-# ReRAM with noise
-noisy = al.Crossbar(32, 16, device=al.ReRAM(
-    g_min=1e-6, g_max=100e-6, num_states=64,
-    read_noise_sigma=0.03,
-    d2d_variation_sigma=0.02,
-))
-noisy.load_weights(W)
-out_noisy = noisy.vmm(V, noise=True, mode=al.SimulationMode.DEVICE)
-
-error = np.max(np.abs(out_ideal - out_noisy))
-print(f"Max error from noise: {error:.6f}")
-```
-
-### Sweeping ADC precision
-
-```python
-for bits in [4, 6, 8, 10]:
-    adc = al.ADC(bits=bits, v_min=-1.0, v_max=1.0)
-    quantized = adc.convert(output)
-    error = np.mean(np.abs(output - quantized))
-    print(f"ADC {bits}-bit → mean error: {error:.6f}")
-```
-
-### Checking quantization loss
-
-```python
-W_reconstructed = crossbar.reconstruct_weights()
-max_error = np.max(np.abs(weights - W_reconstructed))
-print(f"Weight quantization error: {max_error:.6f}")
+# Performs VMM across all 64 tiles (8x8 grid) and accumulates output currents
+y_out = tiled_xbar.vmm(V_in)
 ```
 
 ---
 
-## What's Next?
+## 5. Circuit Export to SPICE
 
-- **API Reference** → `docs/api_reference.md` — every function, every parameter
-- **Core Concepts** → `docs/core_concepts.md` — the physics and math behind it
-- **Examples** → `examples/demo.py` — interactive runnable demo
+Export your loaded crossbar arrays into a standalone SPICE netlist for circuit validation in **ngspice** or **LTspice**:
+
+```python
+from analoglib.exporters import SpiceExporter
+
+exporter = SpiceExporter(dialect="ngspice", R_load=1e3)
+exporter.export("my_circuit.cir", [xbar])
+```
+
+---
+
+## 6. Command Line Interface (CLI)
+
+AnalogLib includes a powerful CLI utility for inspecting, simulating, and profiling `.analog` file artifacts:
+
+```bash
+# View model architecture and device metadata
+analog info model.analog
+
+# Run inference simulation
+analog simulate model.analog --mode hardware
+
+# Profile array power, latency, area, and TOPS/W
+analog profile model.analog
+
+# Export to SPICE netlist
+analog export-spice model.analog --out circuit.cir --dialect ngspice
+```

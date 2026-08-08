@@ -1,159 +1,379 @@
-# AnalogLib — Post-MVP Detailed Implementation Plan & Roadmap
+# AnalogLib — Post-MVP Architecture & Implementation Roadmap (v2)
 
-This document outlines the detailed architectural plans, technical tasks, and subtasks for expanding **AnalogLib** beyond the MVP.
+> **Key architectural change from v1**: AIR (Analog Intermediate Representation) is the **central contract** of the post-MVP system, not a final phase. All converters, simulators, exporters, and analyzers speak AIR. This avoids converter proliferation and enforces a clean dependency graph.
 
 ---
 
-## Roadmap Overview
+## System Architecture
 
+```text
+                     ┌─────────────────────────┐
+                     │  PyTorch / TF / ONNX     │
+                     └───────────┬─────────────┘
+                                 ↓
+                     ┌─────────────────────────┐
+                     │    Model Converters       │
+                     └───────────┬─────────────┘
+                                 ↓
+                     ┌─────────────────────────┐
+                     │           AIR            │
+                     │  Analog Intermediate     │
+                     │  Representation          │
+                     └───────────┬─────────────┘
+                                 ↓
+                  ┌──────────────┴──────────────┐
+                  ↓                             ↓
+           Crossbar                     TiledCrossbar
+                  │                             │
+                  └──────────────┬──────────────┘
+                                 ↓
+                       Hardware Effects Pipeline
+              ┌──────────────────┼──────────────────┐
+              ↓                  ↓                  ↓
+           IR Drop            Thermal           Drift/Noise
+              └──────────────────┼──────────────────┘
+                                 ↓
+                     ┌─────────────────────────┐
+                     │    Simulation Engine      │
+                     │   Ideal / Device / HW    │
+                     └───────────┬─────────────┘
+                                 ↓
+                  ┌──────────────┼──────────────┐
+                  ↓              ↓              ↓
+              Analytics    Visualization      Export
+               Power/Area    Dashboard     SPICE / VA
+                  └──────────────┼──────────────┘
+                                 ↓
+                               CLI
 ```
-Phase 1: Neural Network Importers & Conversion (PyTorch / TensorFlow / ONNX)
-Phase 2: Advanced Scalable Hardware Simulation (TiledCrossbar, IR Drop, Thermal)
-Phase 3: Circuit & Hardware Exporters (SPICE Netlists, Verilog-A)
-Phase 4: Analytics & Performance Profiler (Power, Energy, Area, Latency)
-Phase 5: Visualization & Interactive Dashboard (Matplotlib, Bokeh, Web UI)
-Phase 6: CLI & Tooling Pipeline (`analog` CLI, compilation targets)
-Phase 7: Analog Intermediate Representation (AIR)
+
+---
+
+## Interface Contract (Freeze Before Implementing Any Phase)
+
+> **Before starting Phase 1**, the coding implementation must honor these interface contracts. This prevents rewriting Phase 1 code at Phase 3 when exporters and tiled arrays are added.
+
+| Interface | Description |
+|-----------|-------------|
+| `Device` | Analog memory cell (already implemented) |
+| `MappingStrategy` | Weight ↔ conductance (already implemented) |
+| `Effect` | Pluggable physical effect applied before/during VMM |
+| `Crossbar` | Single-array VMM engine (already implemented) |
+| `TiledCrossbar` | Multi-tile VMM, exposes same `.vmm()` interface |
+| `SimulationEngine` | Orchestrates layers + effects + peripherals |
+| `SimulationMode` | Ideal / Device / Hardware / SPICE (already implemented) |
+| `AIRGraph` | Framework-neutral model graph |
+| `AIRLayer` | Node in AIRGraph (Crossbar, Activation, etc.) |
+| `AnalogModel` | High-level user-facing model wrapping AIR |
+| `Exporter` | Produces SPICE/Verilog-A from AIR |
+| `Analyzer` | Computes power/area/latency from simulation results |
+
+---
+
+## Dependency Order
+
+```text
+Phase 0 (done):   Core MVP — Device, Mapping, Crossbar, Engine, Serialization
+Phase 1:          AIR Core Schema (defines all future interfaces)
+Phase 2:          Model Converters (PyTorch, TF, ONNX → AIR)
+Phase 3:          TiledCrossbar (AIR → tiled execution)
+Phase 4:          Hardware Effects (IR Drop, Thermal, Drift as pluggable Effects)
+Phase 5:          Analytics (power, area, latency — consumes simulation results)
+Phase 6:          Exporters (AIR → SPICE, Verilog-A)
+Phase 7:          Visualization Dashboard
+Phase 8:          CLI
 ```
 
 ---
 
-## Phase 1: Neural Network Importers & Model Conversion
+## Phase 1: AIR Core Schema (`analoglib.air`)
 
 ### Goal
-Allow researchers to pass any trained PyTorch or TensorFlow model directly into AnalogLib, converting standard `Linear` / `nn.Linear` / `Dense` layers into simulated analog crossbar arrays automatically.
+Define the intermediate representation of an analog hardware graph. All converters and exporters target this — not raw `Crossbar` objects. The schema replaces the need for N separate framework-specific paths.
 
-### Tasks & Subtasks
+```text
+PyTorch ──┐
+ONNX ─────┼──→  AIR  ──→  Crossbar / TiledCrossbar / SPICE / CLI
+TensorFlow┘
+```
 
-#### Task 1.1: PyTorch Model Converter (`analoglib.neural.torch_converter`)
-- [ ] **Subtask 1.1.1**: Implement layer inspection for `nn.Linear` and `nn.Conv2d` layers.
-- [ ] **Subtask 1.1.2**: Implement weight extraction and conversion to `Crossbar` objects using specified `Device` and `MappingStrategy`.
-- [ ] **Subtask 1.1.3**: Implement PyTorch custom autograd module (`AnalogLinear` / `AnalogConv2d`) for PyTorch-native forward passes using `Crossbar.vmm`.
-- [ ] **Subtask 1.1.4**: Add support for activation functions (`ReLU`, `Sigmoid`, `Softmax`) between crossbar layers.
-- [ ] **Subtask 1.1.5**: Write unit tests for PyTorch converter using standard models (e.g., MNIST MLP).
+### Task 1.1: `AIRGraph` and `AIRLayer` schema
+- [ ] Define `AIRLayer` types: `CrossbarLayer`, `ActivationLayer`, `InlineLayer`
+- [ ] Define YAML/dict schema: `matrix`, `device`, `mapping`, `tiles`, `peripherals`, `effects`, `simulation_config`
+- [ ] Implement `AIRGraph` container with ordered layer list and metadata
+- [ ] Implement `AIRGraph.to_dict()` / `AIRGraph.from_dict()` serialization
 
-#### Task 1.2: TensorFlow / Keras Model Converter (`analoglib.neural.tf_converter`)
-- [ ] **Subtask 1.2.1**: Implement Keras `Dense` and `Conv2D` layer weight extractor.
-- [ ] **Subtask 1.2.2**: Implement custom Keras layer (`AnalogDenseLayer`) wrapping AnalogLib VMM.
-- [ ] **Subtask 1.2.3**: Support functional and sequential Keras model conversion.
-- [ ] **Subtask 1.2.4**: Write unit tests for TensorFlow/Keras model conversion.
+### Task 1.2: AIR → Crossbar Lowering Pass
+- [ ] Implement `air.lower(air_graph) → list[Crossbar | TiledCrossbar]`
+- [ ] Populate `SimulationEngine` from a lowered AIR graph
+- [ ] Write invariant test: `lower(to_air(W)).vmm(x) ≈ W @ x`
 
-#### Task 1.3: ONNX Model Importer (`analoglib.neural.onnx_importer`)
-- [ ] **Subtask 1.3.1**: Parse ONNX model graph to extract `Gemm` and `Conv` nodes and tensor weights.
-- [ ] **Subtask 1.3.2**: Map ONNX computational graph to sequential `SimulationEngine` crossbar layers.
-- [ ] **Subtask 1.3.3**: Unit test ONNX model loading.
+### Task 1.3: `AnalogModel` high-level API
+- [ ] Implement `AnalogModel` wrapping an `AIRGraph` with `.compile()`, `.simulate()`, `.report()`, `.save()` / `.load()` methods
+- [ ] `.compile(device=..., tile=..., mapping=..., ...)` produces a lowered `SimulationEngine`
+- [ ] `.simulate(mode=..., effects=..., adc_bits=..., dac_bits=...)` runs the engine
+- [ ] `.report()` prints structured hardware summary
+
+### AIR YAML Example
+
+```yaml
+model:
+  name: mlp
+layers:
+  - type: crossbar
+    matrix: [128, 256]
+    device: ReRAM
+    mapping: differential
+    tiles: [128, 128]
+    peripherals:
+      dac: {bits: 8}
+      adc: {bits: 8}
+    effects:
+      ir_drop: {r_wire: 1.0}
+      noise: {sigma: 0.03}
+```
 
 ---
 
-## Phase 2: Advanced Scalable Hardware Simulation
+## Phase 2: Model Converters (`analoglib.neural`)
 
 ### Goal
-Simulate large neural network weights that exceed single crossbar dimensions (e.g., 2048×2048 weight matrix mapped to 128×128 tiles), plus physical circuit non-idealities like wire resistance (IR drop) and sneak paths.
+Convert trained framework model graphs to AIR, then lower to Crossbar. Converters produce AIR — not Crossbars directly. This keeps the converter logic completely decoupled from hardware implementation.
 
-### Tasks & Subtasks
+### Implementation order within Phase 2
 
-#### Task 2.1: Tiled Crossbar Engine (`analoglib.crossbar.tiled`)
-- [ ] **Subtask 2.1.1**: Implement `TiledCrossbar(matrix_rows, matrix_cols, tile_rows, tile_cols)`.
-- [ ] **Subtask 2.1.2**: Implement automatic weight splitting across a 2D grid of `Crossbar` tiles.
-- [ ] **Subtask 2.1.3**: Implement block matrix-vector multiplication with partial current accumulation across column tiles.
-- [ ] **Subtask 2.1.4**: Unit tests for weight tiling and exact mathematical equivalence.
+1. `nn.Linear` → `CrossbarLayer` AIR node
+2. Sequential MLP (stack of Linear + Activations)
+3. Activations (ReLU, Sigmoid, Softmax) as `ActivationLayer` nodes
+4. `nn.Conv2d` lowered via **im2col → GEMM → CrossbarLayer** (not a direct crossbar model)
 
-#### Task 2.2: Parasitic & IR Drop Simulator (`analoglib.hardware.ir_drop`)
-- [ ] **Subtask 2.2.1**: Implement parasitic wire resistance model (`r_wire` per cell segment).
-- [ ] **Subtask 2.2.2**: Build node voltage solver (iterative linear solver / MNA matrix solver) to compute line voltage drops.
-- [ ] **Subtask 2.2.3**: Integrate IR drop degradation into `Crossbar.vmm` in `SimulationMode.HARDWARE`.
-- [ ] **Subtask 2.2.4**: Benchmark performance of IR drop solver for 64×64 and 128×128 crossbars.
+### Task 2.1: PyTorch Converter (`analoglib.neural.torch_converter`)
+- [ ] Graph walk over `nn.Module` children
+- [ ] `nn.Linear` → `AIRLayer(type="crossbar", matrix=[in, out], weights=W)`
+- [ ] `nn.ReLU / Sigmoid / Softmax` → `AIRLayer(type="activation", fn=...)`
+- [ ] `nn.Conv2d` → im2col lowering → `AIRLayer(type="crossbar")`
+- [ ] Unit tests: MNIST MLP forward pass error < 1e-5 in dev mode
 
-#### Task 2.3: Thermal & Drift Noise Models (`analoglib.devices.thermal`)
-- [ ] **Subtask 2.3.1**: Implement temperature-dependent conductance drift `G(T) = G_0 * exp(-E_a / (k * T))`.
-- [ ] **Subtask 2.3.2**: Implement temporal conductance relaxation/drift `G(t) = G_0 * (t / t_0)^(-nu)`.
-- [ ] **Subtask 2.3.3**: Add thermal/drift noise models into `ReRAM` device class.
+### Task 2.2: TensorFlow Converter (`analoglib.neural.tf_converter`)
+- [ ] Keras `Dense` → `CrossbarLayer`
+- [ ] Keras `Conv2D` → im2col → `CrossbarLayer`
+- [ ] Functional + Sequential API support
+
+### Task 2.3: ONNX Importer (`analoglib.neural.onnx_importer`)  
+- [ ] Parse `Gemm` / `MatMul` / `Conv` nodes in ONNX graph
+- [ ] Emit `AIRLayer` nodes from ONNX nodes
+- [ ] Tests: export from both PyTorch and TF, validate AIR equivalence
 
 ---
 
-## Phase 3: Circuit Exporters (SPICE & Verilog-A)
+## Phase 3: TiledCrossbar (`analoglib.crossbar.tiled`)
 
 ### Goal
-Export crossbars and trained weights into industry-standard circuit simulation files (SPICE netlists, Verilog-A behavioral models) for chip design verification in Cadence Spectre, LTspice, or ngspice.
+Handle weight matrices larger than a single crossbar tile. Expose **identical VMM interface** to `Crossbar` so the simulator doesn't care.
 
-### Tasks & Subtasks
+### Primary Invariant Test (must pass before shipping)
 
-#### Task 3.1: SPICE Netlist Generator (`analoglib.exporters.spice`)
-- [ ] **Subtask 3.1.1**: Implement `SpiceExporter(crossbar, format="ngspice" | "ltspice" | "spectre")`.
-- [ ] **Subtask 3.1.2**: Generate subcircuit subblocks for individual ReRAM cells with specified conductance values (`R_cell = 1/G`).
-- [ ] **Subtask 3.1.3**: Add parasitics (wire resistors `R_wire` and line capacitors `C_line`).
-- [ ] **Subtask 3.1.4**: Add input voltage source drivers and output sense amplifier load resistors.
-- [ ] **Subtask 3.1.5**: Write netlist validation tests and automated ngspice execution runner.
+```python
+W = np.random.randn(512, 256)
+x = np.random.randn(512)
 
-#### Task 3.2: Verilog-A Model Generator (`analoglib.exporters.veriloga`)
-- [ ] **Subtask 3.2.1**: Template behavioral Verilog-A module for compact ReRAM cell simulation.
-- [ ] **Subtask 3.2.2**: Generate top-level Verilog-A crossbar module with embedded conductance parameters.
-- [ ] **Subtask 3.2.3**: Test output syntax compatibility with Synopsys HSPICE and Cadence Spectre.
+ref = Crossbar(512, 256).vmm(x)
+tiled = TiledCrossbar.from_matrix(W, tile_shape=(128, 128), device=ReRAM(...))
+assert np.allclose(ref, tiled.vmm(x), atol=1e-6)  # ideal mode
+```
+
+### Task 3.1: `TiledCrossbar`
+- [ ] Split weight matrix into `(ceil(rows/tile_r), ceil(cols/tile_c))` tile grid
+- [ ] Pad final tiles to tile dimensions with 0s
+- [ ] VMM: partial current accumulation across row-tiles, concatenation across col-tiles
+- [ ] Expose `get_conductance()` and `reconstruct_weights()` across all tiles
+
+### Task 3.2: AIR integration
+- [ ] `AIRLayer(tiles=[128,128])` lowers to `TiledCrossbar` not `Crossbar`
+- [ ] `TiledCrossbar` saves/loads natively in `.analog` format
 
 ---
 
-## Phase 4: Analytics & Performance Profiler
+## Phase 4: Hardware Effects (`analoglib.effects`)
 
 ### Goal
-Provide hardware researchers with accurate estimations of power consumption, energy efficiency (TOPS/W), chip area (μm²), and latency (ns).
+Rename and reorganize physical effects into a separate pluggable pipeline. IR drop is **not** a device property — it is a system/interconnect effect.
 
-### Tasks & Subtasks
+### New module layout
 
-#### Task 4.1: Power & Energy Estimator (`analoglib.analysis.power`)
-- [ ] **Subtask 4.1.1**: Calculate static array power `P_static = Σ (V_i^2 * G_ij)`.
-- [ ] **Subtask 4.1.2**: Calculate dynamic peripheral power (ADC/DAC conversion energy per bit).
-- [ ] **Subtask 4.1.3**: Compute total energy per VMM pass `E_total = P_total * t_read`.
-- [ ] **Subtask 4.1.4**: Calculate energy efficiency metric: `TOPS/W = (2 * M * N) / (E_total * 10^12)`.
+```text
+analoglib/
+    effects/
+        __init__.py
+        base.py       ← Effect ABC
+        ir_drop.py
+        thermal.py
+        drift.py
+        variation.py
+        noise.py      ← (migrated from devices/noise.py)
+```
 
-#### Task 4.2: Area & Layout Profiler (`analoglib.analysis.area`)
-- [ ] **Subtask 4.2.1**: Estimate crossbar array area based on cell feature size (`F²` units, e.g., 4F² per 1R cell).
-- [ ] **Subtask 4.2.2**: Estimate ADC/DAC peripheral circuit area based on bit precision lookup tables.
-- [ ] **Subtask 4.2.3**: Produce summary hardware report (`print_hardware_summary(xbar)`).
+### Effect ABC
+
+```python
+class Effect(ABC):
+    def apply(self, g: np.ndarray, *, context: EffectContext) -> np.ndarray:
+        ...
+```
+
+### Crossbar API change (additive, non-breaking)
+
+```python
+# New optional parameter
+Crossbar(rows, cols, device=reram, effects=[IRDrop(r_wire=1.0), Thermal(T=350)])
+```
+
+### Task 4.1: Effect ABC + registry
+- [ ] Define `Effect` base class and `EffectContext` (crossbar geometry, voltages, temperature)
+- [ ] Implement registry via `__init_subclass__` (same pattern as `Device`)
+
+### Task 4.2: IR Drop (most valuable, implement first)
+- [ ] Parasitic wire resistance model (r_wire per cell segment)
+- [ ] Node voltage solver via MNA matrix for a tile
+- [ ] Benchmark: 64×64 in < 50ms, 128×128 in < 500ms
+
+### Task 4.3: Thermal
+- [ ] Temperature-dependent G: `G(T) = G_0 * exp(-E_a / (k*T))`
+- [ ] `Thermal(T_kelvin=300, E_a=...)` Effect
+
+### Task 4.4: Temporal Drift
+- [ ] `G(t) = G_0 * (t / t_0)^(-nu)` power-law retention drift
+- [ ] `Drift(t_seconds=..., nu=...)` Effect
+
+> **Note**: `SimulationMode.HARDWARE` will automatically apply all `effects` registered on a `Crossbar` during VMM. No new enum value needed.
 
 ---
 
-## Phase 5: Visualization & Interactive Dashboard
+## Phase 5: Analytics (`analoglib.analysis`)
 
-### Goal
-Provide graphical tools to plot conductance distributions, weight error heatmaps, noise sweeps, and interactive web dashboards.
+> **Important correction**: All power formulas must consume **actual cell voltages from the hardware solver** (not assume ideal input voltage), especially after IR drop is enabled.
 
-### Tasks & Subtasks
+### Core metrics to track internally
 
-#### Task 5.1: Matplotlib Plotting Suite (`analoglib.visualization.plots`)
-- [ ] **Subtask 5.1.1**: `plot_conductance_matrix(crossbar)` — heatmap of G⁺ and G⁻ values.
-- [ ] **Subtask 5.1.2**: `plot_weight_error_histogram(w_original, w_reconstructed)` — distribution of quantization errors.
-- [ ] **Subtask 5.1.3**: `plot_noise_sweep(snr_list, accuracy_list)` — accuracy vs. read noise curve.
-- [ ] **Subtask 5.1.4**: `plot_adc_precision_sweep(bits_list, accuracy_list)` — accuracy vs. ADC bits curve.
+| Metric | Symbol | Unit |
+|--------|--------|------|
+| Operations per VMM | ops | 2MN |
+| Crossbar read energy | E_read | J |
+| ADC conversion energy | E_adc | J |
+| DAC conversion energy | E_dac | J |
+| Total energy per pass | E_total | J |
+| Latency per VMM | t_vmm | s |
+| Static array power | P_static | W |
+| Dynamic total power | P_total | W |
+| Throughput | T | ops/s |
+| Energy efficiency | η | TOPS/W |
 
-#### Task 5.2: Web Dashboard (`analoglib.visualization.dashboard`)
-- [ ] **Subtask 5.2.1**: Build lightweight Streamlit / Dash web interface for interactive crossbar tuning.
-- [ ] **Subtask 5.2.2**: Allow real-time slider controls for `g_min`, `g_max`, `num_states`, `read_noise_sigma`, and `adc_bits`.
+### Correct power formula (IR drop-aware)
+
+```text
+P = Σ_{i,j} V_ij² × G_ij          (uses actual cell voltage, not input voltage)
+```
+
+### Task 5.1: `AnalogProfiler`
+- [ ] `.profile(simulation_result)` → `AnalogReport`
+- [ ] All metrics derived from simulation pass results (not re-computed from scratch)
+- [ ] `AnalogReport.summary()` prints structured table
+
+### Task 5.2: Area estimator
+- [ ] Cell area from `F²` technology node parameter
+- [ ] ADC/DAC peripheral area lookup table by precision
 
 ---
 
-## Phase 6: CLI & Tooling Pipeline
+## Phase 6: Exporters (`analoglib.exporters`)
 
-### Goal
-Command-line interface for batch compiling models, running simulations, and generating hardware reports without writing Python code.
+### Goal: AIR → circuit representation
 
-### Tasks & Subtasks
+```text
+AnalogModel
+    ↓
+   AIR
+    ↓
+SPICE netlist ─→ ngspice / LTspice
+```
 
-#### Task 6.1: Command-Line Interface (`analoglib.cli`)
-- [ ] **Subtask 6.1.1**: Implement `analog compile --input model.onnx --device reram --out model.analog`.
-- [ ] **Subtask 6.1.2**: Implement `analog simulate --model model.analog --input data.npy --mode hardware`.
-- [ ] **Subtask 6.1.3**: Implement `analog export-spice --model model.analog --out circuit.cir`.
-- [ ] **Subtask 6.1.4**: Implement `analog info model.analog` — inspect encrypted metadata and layer info.
+This provides a **validation story**: compare AnalogLib simulation against SPICE simulation.
+
+### SPICE dialect support order (implement and validate individually)
+
+1. ngspice (first, open source, easiest to automate)
+2. LTspice
+3. Spectre (do not claim compatibility without test)
+4. HSPICE (do not claim compatibility without test)
+
+### Task 6.1: `SpiceExporter`
+- [ ] Cell subcircuit: `R_cell = 1/G`, plus optional C_line per cell
+- [ ] Wire parasitics: `R_wire` per metal segment
+- [ ] Voltage source drivers on row lines
+- [ ] Sense amplifier load resistor on column lines
+- [ ] `.export(path, dialect="ngspice")` writes `.cir` file
+
+### Task 6.2: Verilog-A
+- [ ] Behavioral ReRAM cell module
+- [ ] Top-level crossbar module with embedded conductance parameters
 
 ---
 
-## Phase 7: Analog Intermediate Representation (AIR)
+## Phase 7: Visualization (`analoglib.visualization`)
 
-### Goal
-A standardized intermediate representation (AIR) defining crossbar topology, device mapping, routing, and peripheral configurations, enabling interoperability between hardware compilers and analog simulators.
+> Build the underlying plot functions first. Hold the interactive dashboard until the rest of the API stabilizes.
 
-### Tasks & Subtasks
+### Task 7.1: Core plot API (`analoglib.visualization.plots`)
+- [ ] `plot_conductance_matrix(crossbar)` — heatmap of G+ and G−
+- [ ] `plot_weight_error_histogram(W_orig, W_recon)` — quantization error distribution
+- [ ] `plot_noise_sweep(sigmas, snr_list)` — read noise vs SNR
+- [ ] `plot_adc_sweep(bits_list, sqnr_list)` — ADC precision vs SQNR
 
-#### Task 7.1: AIR Specification & Compiler (`analoglib.air`)
-- [ ] **Subtask 7.1.1**: Define JSON/YAML schema for AIR graph representations.
-- [ ] **Subtask 7.1.2**: Implement graph lowering pass from PyTorch/ONNX to AIR graph nodes.
-- [ ] **Subtask 7.1.3**: Implement AIR runtime interpreter executing VMM passes through `SimulationEngine`.
+### Task 7.2: Interactive dashboard (after API freeze)
+- [ ] Streamlit / Dash interface for live parameter sweeps
+
+---
+
+## Phase 8: CLI (`analoglib.cli`)
+
+```bash
+analog compile model.onnx --device reram --tile 128x128 --out model.analog
+analog simulate model.analog --mode hardware --adc 8 --dac 8
+analog analyze model.analog
+analog export-spice model.analog --dialect ngspice --out circuit.cir
+analog info model.analog
+```
+
+### Task 8.1: CLI entry point
+- [ ] `click`-based CLI registered as `analoglib.cli:main` in `pyproject.toml`
+- [ ] `analog compile` → calls `neural.{torch|onnx|tf}_converter` → `AIR` → `.analog`
+- [ ] `analog simulate` → loads `.analog` → `SimulationEngine.run()`
+- [ ] `analog analyze` → loads `.analog` + simulation log → `AnalogProfiler.profile()`
+- [ ] `analog export-spice` → loads `.analog` → `SpiceExporter.export()`
+- [ ] `analog info` → decrypts metadata and prints layer summary
+
+---
+
+## Target Vision: End-to-End Researcher Workflow
+
+```python
+import analoglib as al
+
+model = al.import_model("mnist.onnx")
+
+model.compile(
+    device=al.ReRAM(g_min=1e-6, g_max=100e-6, num_states=256),
+    tile=(128, 128),
+    mapping="differential",
+)
+
+result = model.simulate(
+    mode="hardware",
+    effects={"ir_drop": True, "noise": True, "drift": True},
+    adc_bits=8,
+    dac_bits=8,
+)
+
+result.report()
+# → structured report: accuracy, energy, latency, TOPS/W
+```

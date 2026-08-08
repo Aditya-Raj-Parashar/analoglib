@@ -1,254 +1,76 @@
-# AnalogLib — Core Concepts
+# Core Concepts & Mathematical Formulation
 
-This document explains the physics, mathematics, and design principles behind AnalogLib. It is written for researchers who want to understand **why** the library works the way it does.
-
----
-
-## 1. Resistive Crossbar Arrays
-
-A crossbar array is a 2D grid of resistive memory devices placed at the intersection of horizontal (row) and vertical (column) wires.
-
-```
-        col_0    col_1    col_2
-         │        │        │
-row_0 ───┼────────┼────────┼───  V₀
-         │G₀₀     │G₀₁     │G₀₂
-row_1 ───┼────────┼────────┼───  V₁
-         │G₁₀     │G₁₁     │G₁₂
-row_2 ───┼────────┼────────┼───  V₂
-         │        │        │
-         I₀       I₁       I₂
-```
-
-### Physical operation
-
-1. **Input**: Voltage `V_i` is applied to each row wire
-2. **Computation**: At each junction, current flows: `i_{ij} = G_{ij} × V_i` (Ohm's Law)
-3. **Summation**: Column currents sum by Kirchhoff's Current Law: `I_j = Σ_i G_{ij} × V_i`
-
-In matrix form:
-
-```
-I = V @ G        (vector-matrix multiply)
-```
-
-This computes an entire matrix-vector multiplication **in one analog step**, as opposed to O(n²) multiply-accumulate operations in digital.
-
-### Why this matters for neural networks
-
-A fully-connected neural network layer computes `y = W @ x + b`. The weight matrix `W` can be stored as conductances `G` in a crossbar, and input `x` can be encoded as voltages `V`. The output currents `I` directly give the matrix product — no digital multipliers needed.
+**AnalogLib** models physical analog in-memory computing (IMC) architectures using first-principles physics and circuit theory. This document provides the mathematical derivations, physical equations, and architectural concepts behind AnalogLib.
 
 ---
 
-## 2. Device Physics
+## 1. Conductance Mapping Strategies
 
-### 2.1 ReRAM (Resistive RAM)
+Weights in a digital neural network $W \in [-w_{\text{max}}, w_{\text{max}}]$ are mapped onto physical device conductances $G \in [G_{\text{min}}, G_{\text{max}}]$.
 
-ReRAM devices store data as resistance states. A **conductive filament** forms or dissolves inside a metal-insulator-metal (MIM) structure, switching between high-resistance (HRS) and low-resistance (LRS) states.
+### Differential Conductance Mapping (`DifferentialMapping`)
+To represent positive and negative weights, each logical matrix entry $W_{i,j}$ uses two physical memristive cells: a positive cell $G^+_{i,j}$ and a negative cell $G^-_{i,j}$.
 
-**AnalogLib models these properties:**
+Given weight scaling factor:
+$$\alpha = \frac{G_{\text{max}} - G_{\text{min}}}{2 \cdot w_{\text{max}}}$$
+And midpoint conductance:
+$$G_{\text{mid}} = \frac{G_{\text{max}} + G_{\text{min}}}{2}$$
 
-| Property | Parameter | Physical origin |
-|----------|-----------|-----------------|
-| Conductance range | `g_min`, `g_max` | HRS and LRS states |
-| Discrete levels | `num_states` | Finite filament configurations |
-| Read noise | `read_noise_sigma` | Thermal + 1/f noise during read |
-| Programming error | `programming_error_sigma` | Imprecise filament formation |
-| D2D variation | `d2d_variation_sigma` | Manufacturing non-uniformity |
-| Stuck-at faults | `stuck_at_fault_rate` | Permanent device defects |
+The mapped conductances are defined as:
+$$G^+_{i,j} = G_{\text{mid}} + \frac{1}{2} \alpha W_{i,j}$$
+$$G^-_{i,j} = G_{\text{mid}} - \frac{1}{2} \alpha W_{i,j}$$
 
-#### Quantization model
-
-Conductance levels are modeled as uniformly distributed between `g_min` and `g_max`:
-
-```
-G_levels = linspace(g_min, g_max, num_states)
-```
-
-This is the standard model used in NeuroSim, CrossSim, and most crossbar simulation literature. Real devices may have non-uniform level spacing — this can be modeled by subclassing `Device`.
-
-> **Scientific note**: The uniform-level model is an approximation. Real ReRAM devices exhibit state-dependent noise (σ varies with G) and non-uniform level spacing. AnalogLib clearly marks this as a simplification.
-
-#### Noise model
-
-Read noise is modeled as additive Gaussian:
-
-```
-G_noisy = G + N(0, σ²)
-where σ = read_noise_sigma × (g_max - g_min)
-```
-
-This is a relative sigma — specifying `read_noise_sigma=0.03` means σ is 3% of the conductance window.
-
-### 2.2 IdealDevice
-
-A mathematically perfect device with:
-- Continuous conductance (infinite resolution)
-- Zero noise, zero variation
-- Useful as a **controlled baseline** for isolating error sources
+#### Net Differential Conductance & Current:
+$$\Delta G_{i,j} = G^+_{i,j} - G^-_{i,j} = \alpha W_{i,j}$$
+$$I_j = \sum_i V_i (G^+_{i,j} - G^-_{i,j}) = \sum_i V_i \Delta G_{i,j} = \alpha \sum_i V_i W_{i,j}$$
 
 ---
 
-## 3. Weight-to-Conductance Mapping
+## 2. Device Non-Idealities & Conductance Quantization
 
-### 3.1 The sign problem
+### Discrete Conductance States (`ReRAM`)
+Physical NVM cells (ReRAM/PCM) possess a finite number of programmable conductance levels $N_{\text{states}}$.
 
-Neural network weights are signed (positive and negative), but conductance is always non-negative (`G ≥ 0`). This is a fundamental challenge.
+Level step size:
+$$\Delta G = \frac{G_{\text{max}} - G_{\text{min}}}{N_{\text{states}} - 1}$$
 
-### 3.2 Differential mapping (default)
+Quantization function:
+$$Q(G) = G_{\text{min}} + \text{round}\left( \frac{G - G_{\text{min}}}{\Delta G} \right) \cdot \Delta G$$
 
-The standard solution uses **two conductances per weight**:
-
-```
-W_norm = (W + w_max) / (2 × w_max)        ∈ [0, 1]
-
-G⁺ = g_min + W_norm × (g_max - g_min)
-G⁻ = g_min + (1 - W_norm) × (g_max - g_min)
-```
-
-The effective weight is proportional to `G⁺ - G⁻`:
-
-```
-When W > 0:  G⁺ > G⁻  →  G⁺ - G⁻ > 0  ✓
-When W < 0:  G⁺ < G⁻  →  G⁺ - G⁻ < 0  ✓
-When W = 0:  G⁺ = G⁻  →  G⁺ - G⁻ = 0  ✓
-```
-
-**Cost**: 2× the devices. **Benefit**: Full signed weight support, symmetric behavior.
-
-### 3.3 Offset mapping (alternative)
-
-Uses a single device with mid-conductance as the zero point:
-
-```
-G = g_mid + W × scale
-where g_mid = (g_min + g_max) / 2
-      scale = (g_max - g_min) / (2 × w_max)
-```
-
-**Cost**: 1× devices. **Drawback**: Must subtract the offset current, reducing effective dynamic range.
-
-### 3.4 Roundtrip error
-
-Due to quantization, `W → G → W'` introduces error. For `n` conductance levels with differential mapping, the maximum weight error is approximately:
-
-```
-ε_max ≈ 2 × w_max / (n - 1)
-```
-
-For 256 levels and w_max=1: `ε_max ≈ 0.008` (< 1%).
+### Conductance Read Noise
+During readout, thermal and random telegraph noise (RTN) perturb the cell conductance:
+$$\tilde{G} = Q(G) + \delta G, \quad \delta G \sim \mathcal{N}\left(0, \sigma_{\text{read}}^2 (G_{\text{max}} - G_{\text{min}})^2\right)$$
 
 ---
 
-## 4. Simulation Fidelity Levels
+## 3. Hardware Non-Ideality Effects (`analoglib.effects`)
 
-AnalogLib defines a hierarchy of simulation modes:
+### 1. Parasitic Wire IR Drop (`IRDrop`)
+Wordlines and bitlines have finite parasitic wire resistance $r_{\text{wire}}$ per cell segment. The effective row voltage decreases along the array:
+$$V_{\text{eff}}[i, j] = V_i \cdot \left(1 - r_{\text{wire}} \sum_{j'=0}^{j-1} G_{i, j'} \cdot (N_{\text{cols}} - j') \right)$$
 
-### Level 0: Ideal (mathematical)
+### 2. Arrhenius Thermal Scaling (`Thermal`)
+ReRAM conductance follows Arrhenius temperature dependence:
+$$G(T) = G_0 \cdot \exp\left( -\frac{E_a}{k_B} \left( \frac{1}{T} - \frac{1}{T_{\text{ref}}} \right) \right)$$
+where $E_a$ is the activation energy (eV), $k_B = 8.6173 \times 10^{-5}\text{ eV/K}$, and $T_{\text{ref}} = 300\text{ K}$.
 
-```python
-I = V @ W    # Pure matrix multiply, no hardware effects
-```
-
-Use for: **Algorithm development, correctness testing.**
-
-### Level 1: Device-aware
-
-```python
-G = quantize(map(W))        # Quantized conductances
-G_noisy = G + noise          # Read noise
-I = V @ (G⁺_noisy - G⁻_noisy)
-```
-
-Includes: conductance quantization, read noise, D2D variation, programming error, stuck-at faults.
-
-Use for: **Accuracy degradation studies, noise sensitivity analysis.**
-
-### Level 2: Hardware-aware
-
-```python
-V = DAC(V_digital)           # Input quantization
-I = V @ (G⁺_noisy - G⁻_noisy)
-output = ADC(I)              # Output quantization
-```
-
-Adds: DAC voltage quantization, ADC current-to-digital quantization, clipping.
-
-Use for: **Full system accuracy estimation, ADC/DAC bit-width optimization.**
+### 3. Power-Law Retention Drift (`Drift`)
+State relaxation over time follows power-law decay:
+$$G(t) = G_0 \cdot \left( \frac{\max(t, t_0)}{t_0} \right)^{-\nu}$$
+where $\nu$ is the drift exponent ($\nu \approx 0.02 - 0.12$) and $t_0$ is the reference time (1 sec).
 
 ---
 
-## 5. ADC/DAC Models
+## 4. Peripheral Converters & Hardware Metrics
 
-### Analog-to-Digital Converter (ADC)
+### Uniform ADC / DAC Quantization (`ADC`, `DAC`)
+The DAC converts input activations $x \in [0, 1]$ into voltages $V \in [V_{\text{min}}, V_{\text{max}}]$ with $B_{\text{dac}}$ bits.
+The ADC converts column currents $I \in [I_{\text{min}}, I_{\text{max}}]$ into digital values with $B_{\text{adc}}$ bits.
 
-Converts continuous output current to discrete digital values:
-
-```
-Quantized = round((x - v_min) / step) × step + v_min
-where step = (v_max - v_min) / (2^bits - 1)
-```
-
-Key parameter: `bits` — determines resolution. 8-bit ADC = 256 levels.
-
-### Digital-to-Analog Converter (DAC)
-
-Converts digital input to quantized analog voltage. Same math, applied to inputs.
-
----
-
-## 6. File Format (.analog)
-
-AnalogLib uses a proprietary encrypted binary format inspired by GGUF:
-
-```
-┌──────────────────────────────────────┐
-│ Magic: 0xAE4C4942 ("ALIB")          │  4 bytes
-│ Format version                       │  4 bytes (uint32 LE)
-│ Payload length                       │  4 bytes (uint32 LE)
-├──────────────────────────────────────┤
-│ Encrypted payload (AES-256-GCM)      │
-│   → zlib-compressed MessagePack      │
-│   → contains metadata, config, and   │
-│     conductance tensor data           │
-└──────────────────────────────────────┘
-```
-
-### Design decisions
-
-- **Encrypted**: Files are opaque without AnalogLib — protects model IP
-- **Self-contained**: All metadata, device config, and conductances in one file
-- **Versioned**: Format version in header enables forward compatibility
-- **Compact**: zlib compression reduces array storage
-
----
-
-## 7. Plugin Architecture
-
-AnalogLib uses `__init_subclass__` for automatic class discovery:
-
-```python
-# Any subclass of Device is auto-registered:
-class MyCustomDevice(al.Device):
-    def __init__(self, g_min, g_max, num_states, my_param=0.5):
-        super().__init__(g_min, g_max, num_states)
-        self.my_param = my_param
-
-    def quantize(self, g): ...
-    def add_noise(self, g): ...
-    def add_variation(self, g): ...
-
-# It's automatically available:
-al.Device.registry()  # {"ReRAM": ..., "IdealDevice": ..., "MyCustomDevice": ...}
-```
-
-This works for `Device`, `MappingStrategy`, and all other registry-enabled base classes.
-
----
-
-## References
-
-1. Hu, M. et al. "Memristor‐Based Analog Computation and Neural Network Classification with a Dot Product Engine." *Adv. Mater.* 2018.
-2. Chen, P.Y. et al. "NeuroSim: A Circuit-Level Macro Model for Benchmarking Neuro-Inspired Architectures." *IEEE TCAD* 2018.
-3. Agarwal, S. et al. "Achieving Ideal Accuracies in Analog Neuromorphic Computing Using Periodic Carry." *Symp. VLSI Tech.* 2017.
-4. Joshi, V. et al. "Accurate deep neural network inference using computational phase-change memory." *Nature Commun.* 2020.
+### Power & Energy Profiling (`AnalogProfiler`)
+- Array Read Power:
+  $$P_{\text{array}} = \sum_{i,j} V_i^2 \cdot G_{i,j}$$
+- Read Energy:
+  $$E_{\text{read}} = P_{\text{array}} \cdot t_{\text{read}}$$
+- Energy Efficiency (TOPS/W):
+  $$\text{TOPS/W} = \frac{2 \cdot M \cdot N}{(E_{\text{read}} + E_{\text{adc}} + E_{\text{dac}}) \times 10^{12}}$$
