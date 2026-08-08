@@ -1,0 +1,103 @@
+site_name: AnalogLib Documentation
+site_description: "Open-source Python library for analog in-memory computing and neural network inference on resistive crossbars"
+site_author: "Aditya Raj Parashar"
+repo_url: "https://github.com/Aditya-Raj-Parashar/analoglib"
+repo_name: "Aditya-Raj-Parashar/analoglib"
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.details
+  - tables
+  - attr_list
+  - md_in_html
+  - admonition
+
+extra_javascript:
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Capabilities Matrix: capabilities.md
+  - FAQ & AI Discoverability: faq.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Quickstart (5-Min): getting-started/quickstart.md
+      - First VMM: getting-started/first-vmm.md
+      - Core Concepts: getting-started/concepts.md
+  - Concepts & Equations:
+      - Analog Computing: concepts/analog-computing.md
+      - Crossbar Architecture: concepts/crossbars.md
+      - Conductance Mapping: concepts/conductance-mapping.md
+      - Quantization & States: concepts/quantization.md
+      - Device Noise & Faults: concepts/noise.md
+      - Hardware Simulation Engine: concepts/hardware-simulation.md
+  - Physical Devices:
+      - Overview: devices/overview.md
+      - ReRAM Model: devices/reram.md
+      - Custom Devices: devices/device-models.md
+  - Framework Converters:
+      - NumPy Weights: models/numpy.md
+      - PyTorch Models: models/pytorch.md
+      - TensorFlow / Keras: models/tensorflow.md
+      - ONNX Models: models/onnx.md
+  - Simulation & Hardware:
+      - Overview: simulation/overview.md
+      - Ideal Mode: simulation/ideal.md
+      - Device Mode: simulation/device.md
+      - Hardware Mode: simulation/hardware.md
+      - DAC Model: simulation/dac.md
+      - ADC Model: simulation/adc.md
+  - File Format & Exporters:
+      - .analog Binary Format: serialization/analog-format.md
+      - SPICE Exporter: exporters/spice.md
+      - Analytics & Profiler: analytics/profiler.md
+  - End-to-End Tutorials:
+      - Multi-Layer Perceptron (MLP): tutorials/mlp.md
+      - ReRAM VMM Under Noise: tutorials/reram-vmm.md
+      - Quantization & Precision Sweeps: tutorials/noise-analysis.md
+      - Hardware Pipeline & Profiling: tutorials/hardware-pipeline.md
+  - Troubleshooting & Reference:
+      - Common Errors: troubleshooting/common-errors.md
+      - API Reference: api/index.md
+      - Roadmap: roadmap/roadmap.md
+  - Specifications & Developer Notes:
+      - AIR Architecture Guide: air_guide.md
+      - Full API Reference (Single Page): api_reference.md
+      - Core Concepts Specification: core_concepts.md
+      - Architecture & Design Overview: getting_started.md
+      - Post-MVP Architecture Plan: post_mvp_plan.md
+
